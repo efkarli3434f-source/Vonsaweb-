@@ -23,3 +23,60 @@
 @media(max-width:700px){.privacy-banner{padding:12px;align-items:flex-start}.studio-canvas-wrap{padding:9px}.studio-side h2,.studio-preview h2{font-size:25px}.studio-page .pagehead h1{font-size:42px}}
 /* Avoid drifting hit targets on touch devices and during programmatic focus. */
 html{scroll-behavior:auto}
+/* ================= 3D layer – only real content (ambient3d.js, showcase3d.js, app.js) ================= */
+#bg3d{position:fixed;inset:0;z-index:0;pointer-events:none}
+#bg3d canvas{display:block}
+#app{position:relative;z-index:1}
+/* 3D showcase: the real product photos in CSS 3D space – never filtered, cropped or stretched */
+.stage3d{position:relative;display:grid;grid-template-columns:1fr minmax(220px,300px);align-items:stretch;margin:6px 0 30px;padding:0;overflow:hidden;background:radial-gradient(ellipse at 40% 60%,#5a1729 0%,#260713 55%,#13050c 100%)}
+.stage3d-view{position:relative;min-height:380px;overflow:hidden}
+.ring-scene{position:absolute;inset:0;perspective:1100px;perspective-origin:50% 28%;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab}
+.ring-scene.dragging{cursor:grabbing}
+.ring{position:absolute;left:50%;top:44%;width:var(--cw,220px);height:calc(var(--cw,220px) * .6917);margin-left:calc(var(--cw,220px) / -2);margin-top:calc(var(--cw,220px) * -.3458);transform-style:preserve-3d;transform:translateZ(calc(var(--r,300px) * -1)) rotateX(-5deg) rotateY(var(--rot,0deg))}
+.ring-card{position:absolute;inset:0;display:block;transform-style:preserve-3d;transform:rotateY(calc(var(--i,0) * 360deg / var(--n,8))) translateZ(var(--r,300px));-webkit-tap-highlight-color:transparent;outline:none}
+.ring-face,.ring-back{position:absolute;inset:0;border-radius:12px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid #d6a46a99;background:#1b070f;box-shadow:0 18px 40px #000a;transition:box-shadow .35s,border-color .35s}
+.ring-face{-webkit-box-reflect:below 10px linear-gradient(transparent 58%,#0000004d)}
+.ring-back{transform:rotateY(180deg);background:radial-gradient(ellipse at 50% 45%,#3a0c19,#16050b 75%)}
+.ring-face img,.ring-back img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.ring-card.is-front .ring-face{border-color:#ffe2a6;box-shadow:0 0 0 1px #ffe2a6,0 0 36px #f0b0605e,0 18px 40px #000a}
+.ring-card:focus-visible .ring-face{outline:2px solid #ffe4aa;outline-offset:3px}
+.ring-floor{position:absolute;left:50%;top:calc(44% + var(--cw,220px) * .3458 + 6px);width:min(92%,calc(var(--r,300px) * 2.5 + var(--cw,220px)));height:calc(var(--cw,220px) * .55);transform:translateX(-50%);border-radius:50%;border:2px solid #d69a5577;box-shadow:0 0 26px #f29c4040,inset 0 0 30px #f29c4026;background:radial-gradient(ellipse at center,#ffb46a2e,transparent 70%);pointer-events:none}
+.is-pair .ring{transform:rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg))}
+.is-pair .ring-card{--lift:0px;transform:translateX(calc((var(--i,0) - (var(--n,1) - 1) / 2) * var(--cw,220px) * 1.12)) rotateY(calc((var(--i,0) - (var(--n,1) - 1) / 2) * -14deg)) translateZ(var(--lift));transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.is-pair .ring-card.is-front{--lift:34px}
+.is-pair .ring-floor{width:min(92%,calc(var(--cw,220px) * (var(--n,1) * 1.15 + .5)))}
+.stage3d-caption{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:10px;padding:26px;border-left:1px solid #b8814855;background:linear-gradient(90deg,#16070e55,#16070ecc)}
+.stage3d-caption b{font:italic 600 34px/1.05 var(--serif);color:#ffe3af}
+.stage3d-caption p{margin:0;color:#d9b9ad;font-size:13px;max-width:260px}
+.stage3d-caption small{color:var(--sub)}
+.stage3d-nav{position:absolute;left:14px;bottom:14px;display:flex;gap:8px;z-index:2}
+.stage3d-nav button{width:36px;height:36px;border-radius:50%;border:1px solid #c58b5d99;background:#1c0711d9;color:#ffe0ad;font-size:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center;transition:background .2s,transform .2s}
+.stage3d-nav button:hover{background:#4a1628;transform:translateY(-1px)}
+/* gift: the real gift box photo in 3D; opening it releases the real product photos */
+.gift-stage.photo3d{perspective:900px;height:320px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.gift-scene{position:relative;width:min(300px,78%);aspect-ratio:480/332;transform-style:preserve-3d;transform:rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg));transition:transform .3s ease-out}
+.gift-card{position:absolute;inset:0;border-radius:12px;overflow:hidden;border:1px solid #d6a46a99;background:#1b070f;box-shadow:0 18px 40px #000a}
+.gift-card img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.gift-box-card{transform:translateZ(0);transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.gift-item{opacity:0;transform:translateZ(-80px) scale(.5);transition:transform .9s cubic-bezier(.2,.8,.2,1),opacity .35s}
+.gift-stage.opened .gift-box-card{transform:translateY(34%) translateZ(-70px) rotateX(16deg) scale(.76)}
+.gift-stage.opened .gift-item{opacity:1;transition-delay:calc(.15s + var(--k,0) * .12s)}
+.gift-stage.opened .gift-item:nth-child(2){transform:translate(-58%,-24%) translateZ(10px) rotateY(26deg) rotateZ(-5deg) scale(.6)}
+.gift-stage.opened .gift-item:nth-child(3){transform:translate(0,-42%) translateZ(40px) scale(.66)}
+.gift-stage.opened .gift-item:nth-child(4){transform:translate(58%,-24%) translateZ(10px) rotateY(-26deg) rotateZ(5deg) scale(.6)}
+@keyframes ejderFloat{0%,100%{translate:0 0}50%{translate:0 -7px}}
+.gift-stage.photo3d:not(.opened) .gift-box-card{animation:ejderFloat 4.5s ease-in-out infinite}
+/* studio: 3D card – front: the site's own live preview, back: the real product photo */
+.flip3d{perspective:900px;margin-bottom:8px;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
+.flip3d.dragging{cursor:grabbing}
+.flip3d-inner{position:relative;transform-style:preserve-3d;transform:rotateX(var(--tx,0deg)) rotateY(calc(var(--fy,0deg) + var(--ty,0deg)));transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.flip3d.dragging .flip3d-inner{transition:none}
+.flip3d-face{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.flip3d-front .preview-frame{margin-bottom:0}
+.flip3d-back{position:absolute;inset:0;transform:rotateY(180deg);border:1px solid #c58b5d86;background:#19070e;border-radius:10px;overflow:hidden}
+.flip3d-back img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.flip3d-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.flip3d-tools small{color:var(--sub);font-size:11px}
+@media(max-width:900px){.stage3d{grid-template-columns:1fr}.stage3d-caption{border-left:0;border-top:1px solid #b8814855;padding:18px}.stage3d-view{min-height:320px}}
+@media(max-width:650px){.stage3d-caption b{font-size:28px}.gift-stage.photo3d{height:300px}}
+@media(prefers-reduced-motion:reduce){.is-pair .ring-card,.gift-item,.gift-box-card,.flip3d-inner,.gift-scene{transition:none}.gift-stage.photo3d .gift-box-card{animation:none}}

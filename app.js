@@ -59,17 +59,55 @@ function steps(){return `<div class="steps">${[1,2,3].map(n=>`<div class="card s
 function templateGrid(){return `<div class="template-gallery">${TEMPLATE_IDS.map((id,i)=>`<button data-template-go="${id}" class="card template-show"><span class="template-glyph">${TEMPLATE_ICONS[i]}</span><h3>${tr('template_'+id)}</h3><span class="small muted">${tr('designStart')} →</span></button>`).join('')}</div>`}
 function home(){return `<main><div class="max"><section class="hero"><div class="hero-copy"><div class="eyebrow">${tr('heroKicker')}</div><h1>${tr('heroTitleA')}<span>${tr('heroTitleB')}</span><span>${tr('heroTitleC')}</span></h1><p>${tr('heroP')}</p><div class="hero-actions"><a class="btn" href="${hash('studio/mug')}">✦ ${tr('start')} &nbsp; ↗</a><a class="btn secondary" href="${hash('products')}">${tr('browse')}</a></div></div><div class="hero-art"><img src="${AS}hero_showcase.webp" alt="EJDER Studio ürün ve hediye tasarımları"></div><i class="spark one">✦</i><i class="spark two">✧</i><i class="spark three">✦</i></section>
  <div class="features"><div class="feature"><b>✣</b> ${tr('feature1')}</div><div class="feature"><b>✎</b> ${tr('feature2')}</div><div class="feature"><b>◉</b> ${tr('feature3')}</div><div class="feature"><b>⇩</b> ${tr('feature4')}</div></div>
+ ${stage3d(null,'home-stage')}
  <section class="section"><div class="eyebrow">${tr('categoriesKick')}</div><h2 class="section-title">${tr('categoriesTitle')}</h2><p class="muted">${tr('categoriesText')}</p>${categoryGrid()}</section>
  <section class="section" id="campaigns"><div class="eyebrow">EJDER ✦ STUDIO</div><h2 class="section-title">${tr('campaigns')}</h2><div class="promo-grid"><div class="card promo"><div><span class="pill">✦ MONOGRAM</span><b style="display:block;margin-top:20px">${tr('campaign1')}</b><p>${tr('campaign1s')}</p></div><a class="btn secondary tiny" href="${hash('studio/case')}">${tr('design')} ↗</a></div><div class="card promo"><div><span class="pill">♥ FOTOĞRAF</span><b style="display:block;margin-top:20px">${tr('campaign2')}</b><p>${tr('campaign2s')}</p></div><a class="btn secondary tiny" href="${hash('studio/poster')}">${tr('design')} ↗</a></div><div class="card promo"><div><span class="pill">✧ 3D</span><b style="display:block;margin-top:20px">${tr('campaign3')}</b><p>${tr('campaign3s')}</p></div><a class="btn secondary tiny" href="#gift-demo">${tr('giftOpen')} ↗</a></div></div><div class="disclaimer">${tr('campaignNote')}</div></section>
  <section class="section"><h2 class="section-title">${tr('how')}</h2>${steps()}</section>
- <section class="gift-demo card" id="gift-demo"><div><span class="eyebrow">✦ EJDER GIFT EXPERIENCE</span><h2>${tr('giftHead')}</h2><p>${tr('giftDesc')}</p><button class="btn" data-action="gift-toggle" aria-expanded="false">${tr('giftOpen')}</button></div><div class="gift-stage" aria-label="${tr('giftPreview')}"><div class="gift-glow"></div><div class="gift-thing"><div class="gift-product">☕</div><div class="gift-base"></div><div class="gift-lid"></div><div class="gift-bow">🎀</div></div></div></section>
+ <section class="gift-demo card" id="gift-demo"><div><span class="eyebrow">✦ EJDER GIFT EXPERIENCE</span><h2>${tr('giftHead')}</h2><p>${tr('giftDesc')}</p><button class="btn" data-action="gift-toggle" aria-expanded="false">${tr('giftOpen')}</button></div><div class="gift-stage photo3d" aria-label="${tr('giftPreview')}"><div class="gift-glow"></div><div class="gift-scene"><div class="gift-card gift-box-card"><img src="${AS}giftbox.webp" alt="${escapeHTML(name(product('giftbox')))}" width="480" height="332" draggable="false"></div>${['mug','keychain','case'].map((id,k)=>`<div class="gift-card gift-item" style="--k:${k}" aria-hidden="true"><img src="${AS+id}.webp" alt="" width="480" height="332" draggable="false"></div>`).join('')}</div></div></section>
  <section class="section"><div class="eyebrow">EJDER DESIGN COLLECTION</div><h2 class="section-title">${tr('allTemplates')}</h2><p class="muted">${tr('allTemplatesText')}</p>${templateGrid()}</section></div></main>`}
-function productsPage(){return `<main class="max"><div class="pagehead"><div class="eyebrow">EJDER ✦ CUSTOM</div><h1>${tr('productChoice')}</h1><p>${tr('categoriesText')}</p></div>${categoryGrid()}<div class="section"><h2 class="section-title">${tr('how')}</h2>${steps()}</div></main>`}
-function collectionsPage(id){const c=COLLECTIONS.find(x=>x.id===id)||COLLECTIONS[0]; const [p1,p2]=c.product.map(product);return `<main class="max"><section class="collection-head"><div><div class="eyebrow">EJDER STUDIO • PERSONALIZE</div><h1>${language==='de'?c.de:c.tr}</h1><p>${tr('collectionDesc')}</p><a href="${hash('studio/'+p1.id)}" class="btn tiny">${tr('start')} ↗</a></div><img src="${AS+c.art}" alt="${escapeHTML(language==='de'?c.de:c.tr)}"></section><div class="duo-grid">${[p1,p2].map(p=>`<article class="card duo-card"><div class="duo-visual"><img src="${AS+p.id}.webp" alt="${escapeHTML(name(p))}"></div><div class="duo-text"><div><h2>${escapeHTML(name(p))}</h2><p>${escapeHTML(language==='de'?p.shortDe:p.shortTr)}</p></div><a class="btn" href="${hash('studio/'+p.id)}">${tr('designStart')} ↗</a></div></article>`).join('')}</div><div class="section"><h2 class="section-title">${tr('templateTitle')}</h2>${templateGrid()}</div></main>`}
-function campaignsPage(){return `<main class="max"><div class="pagehead"><span class="eyebrow">EJDER CREATIVE</span><h1>${tr('campaigns')}</h1><p>${tr('campaignNote')}</p></div><div class="promo-grid"><div class="card promo"><div><span class="pill">✦</span><b style="display:block;margin-top:20px">${tr('campaign1')}</b><p>${tr('campaign1s')}</p></div><a class="btn tiny" href="${hash('studio/mug')}">${tr('start')}</a></div><div class="card promo"><div><span class="pill">♡</span><b style="display:block;margin-top:20px">${tr('campaign2')}</b><p>${tr('campaign2s')}</p></div><a class="btn tiny" href="${hash('studio/keychain')}">${tr('start')}</a></div><div class="card promo"><div><span class="pill">✧</span><b style="display:block;margin-top:20px">${tr('campaign3')}</b><p>${tr('campaign3s')}</p></div><a class="btn tiny" href="${hash('studio/giftbox')}">${tr('start')}</a></div></div><div class="section">${categoryGrid()}</div></main>`}
-function templatesPage(){return `<main class="max"><div class="pagehead"><div class="eyebrow">EJDER STYLE COLLECTION</div><h1>${tr('allTemplates')}</h1><p>${tr('allTemplatesText')}</p></div>${templateGrid()}<div class="section"><h2 class="section-title">${tr('productChoice')}</h2>${categoryGrid()}</div></main>`}
-function savedPage(){const items=getSaved();return `<main class="max"><div class="pagehead"><div class="eyebrow">EJDER LOCAL GALLERY</div><h1>${tr('savedHead')}</h1><p>${tr('savedDesc')}</p></div>${items.length?`<div class="saved-grid">${items.map(it=>`<article class="card saved-item"><img src="${it.snapshot}" alt="${escapeHTML(it.product)}"><h3>${escapeHTML(name(product(it.product)))}</h3><div class="muted small">${tr('date')}: ${escapeHTML(new Date(it.date).toLocaleDateString(language==='de'?'de-DE':'tr-TR'))}</div><div class="actions"><button class="btn tiny" data-open-project="${escapeHTML(it.id)}">${tr('open')}</button><button class="btn danger tiny" data-delete-project="${escapeHTML(it.id)}">${tr('delete')}</button></div></article>`).join('')}</div>`:`<div class="text-panel card"><p>${tr('noSaved')}</p><a class="btn" href="${hash('studio/mug')}">${tr('start')}</a></div>`}</main>`}
-function infoPage(type){let title=tr(type==='about'?'aboutTitle':type==='legal'?'legalTitle':'contactTitle');let msg=tr(type==='about'?'aboutP':type==='legal'?'legalP':'contactP');return `<main class="max"><div class="pagehead"><div class="eyebrow">EJDER ✦ STUDIO</div><h1>${title}</h1></div><div class="text-panel card"><p>${msg}</p>${type==='contact'?`<div class="contact-form"><label>${tr('name')}<input disabled placeholder="${tr('name')}"></label><label>${tr('email')}<input disabled placeholder="${tr('email')}"></label><label>${tr('message')}<textarea disabled placeholder="${tr('message')}"></textarea></label><button class="btn" disabled>${tr('contactDisabled')}</button></div>`:type==='about'?`<div class="steps" style="margin-top:30px"><div class="card step"><span class="stepnum">1</span><div><h3>${tr('aboutCard1')}</h3><p>${tr('aboutCard1p')}</p></div></div><div class="card step"><span class="stepnum">2</span><div><h3>${tr('aboutCard2')}</h3><p>${tr('aboutCard2p')}</p></div></div><div class="card step"><span class="stepnum">3</span><div><h3>${tr('aboutCard3')}</h3><p>${tr('aboutCard3p')}</p></div></div></div>`:''}</div></main>`}
+/* ---------- 3D layer: only REAL content (product photos, logo, the customer's own design) ---------- */
+let flipY=0,flipDrag=null;
+/* 3D showcase made from the site's real product photographs (showcase3d.js).
+   Photos are shown exactly as they are – no placeholders, no stretching, no filters. */
+function stage3d(products,extraClass=''){
+  const list=(Array.isArray(products)&&products.length?products:PRODUCTS.map(p=>p.id)).filter(id=>PRODUCTS.some(p=>p.id===id));
+  const many=list.length>3,first=product(list[0]);
+  return `<section class="stage3d card ${extraClass}" aria-label="${words('3D ürün vitrini','3D-Produktvitrine')}">
+    <div class="stage3d-view"><div class="ring-scene" id="ringScene">
+      <div class="ring-floor" aria-hidden="true"></div>
+      ${list.length>1?`<div class="stage3d-nav"><button type="button" data-ring="-1" aria-label="${words('Önceki ürün','Vorheriges Produkt')}">‹</button><button type="button" data-ring="1" aria-label="${words('Sonraki ürün','Nächstes Produkt')}">›</button></div>`:''}
+      <div class="ring">${list.map((id,i)=>{const p=product(id);return `<a class="ring-card" data-product="${id}" style="--i:${i}" href="${hash('studio/'+id)}" aria-label="${escapeHTML(name(p))} – ${escapeHTML(tr('design'))}"><span class="ring-face"><img src="${AS+id}.webp" alt="${escapeHTML(name(p))}" width="480" height="332" draggable="false"></span><span class="ring-back" aria-hidden="true"><img src="${AS}ejder_logo.webp" alt="" width="580" height="258" draggable="false"></span></a>`}).join('')}</div>
+    </div></div>
+    <div class="stage3d-caption"><span class="eyebrow">✦ EJDER 3D ${many?words('VİTRİN','VITRINE'):words('ÖN İZLEME','VORSCHAU')}</span><b id="stageFront">${escapeHTML(name(first))}</b>
+      <p id="stageText">${escapeHTML(language==='de'?first.shortDe:first.shortTr)}</p>
+      <a class="btn tiny" id="stageGo" href="${hash('studio/'+first.id)}">${tr('design')} ↗</a>
+      <small>${many?words('Sürükle veya oklarla döndür · Ürüne tıkla: tasarla','Ziehen oder Pfeile zum Drehen · Produkt anklicken: gestalten'):words('Fareyle 3D eğ · Ürüne tıkla: tasarla','Mit der Maus neigen · Produkt anklicken: gestalten')}</small></div>
+  </section>`;
+}
+function mountShowcase(){
+  const rs=document.getElementById('ringScene');
+  if(!rs||!window.EJDERRing)return;
+  window.EJDERRing.mount(rs,{onFront:id=>{
+    if(!id)return;const p=product(id);
+    const b=document.getElementById('stageFront'),t=document.getElementById('stageText'),a=document.getElementById('stageGo');
+    if(b)b.textContent=name(p);if(t)t.textContent=language==='de'?p.shortDe:p.shortTr;if(a)a.href=hash('studio/'+id);
+  }});
+}
+/* studio: the live 2D preview and the real product photo on the two sides of a 3D card */
+function flipBack(){return Math.abs(Math.round(flipY/180))%2===1;}
+function applyFlip(){
+  const el=document.getElementById('flip3d');if(!el)return;
+  el.style.setProperty('--fy',flipY.toFixed(1)+'deg');
+  const btn=document.querySelector('[data-flip]');
+  if(btn&&!flipDrag){const back=flipBack();btn.textContent=back?words('↻ Tasarımını gör','↻ Dein Design ansehen'):words('↻ Gerçek ürünü gör','↻ Echtes Produkt ansehen');btn.setAttribute('aria-pressed',String(back));}
+}
+
+function productsPage(){return `<main class="max"><div class="pagehead"><div class="eyebrow">EJDER ✦ CUSTOM</div><h1>${tr('productChoice')}</h1><p>${tr('categoriesText')}</p></div>${stage3d()}${categoryGrid()}<div class="section"><h2 class="section-title">${tr('how')}</h2>${steps()}</div></main>`}
+function collectionsPage(id){const c=COLLECTIONS.find(x=>x.id===id)||COLLECTIONS[0]; const [p1,p2]=c.product.map(product);return `<main class="max"><section class="collection-head"><div><div class="eyebrow">EJDER STUDIO • PERSONALIZE</div><h1>${language==='de'?c.de:c.tr}</h1><p>${tr('collectionDesc')}</p><a href="${hash('studio/'+p1.id)}" class="btn tiny">${tr('start')} ↗</a></div><img src="${AS+c.art}" alt="${escapeHTML(language==='de'?c.de:c.tr)}"></section>${stage3d(c.product)}<div class="duo-grid">${[p1,p2].map(p=>`<article class="card duo-card"><div class="duo-visual"><img src="${AS+p.id}.webp" alt="${escapeHTML(name(p))}"></div><div class="duo-text"><div><h2>${escapeHTML(name(p))}</h2><p>${escapeHTML(language==='de'?p.shortDe:p.shortTr)}</p></div><a class="btn" href="${hash('studio/'+p.id)}">${tr('designStart')} ↗</a></div></article>`).join('')}</div><div class="section"><h2 class="section-title">${tr('templateTitle')}</h2>${templateGrid()}</div></main>`}
+function campaignsPage(){return `<main class="max"><div class="pagehead"><span class="eyebrow">EJDER CREATIVE</span><h1>${tr('campaigns')}</h1><p>${tr('campaignNote')}</p></div>${stage3d(['mug','keychain','giftbox'])}<div class="promo-grid"><div class="card promo"><div><span class="pill">✦</span><b style="display:block;margin-top:20px">${tr('campaign1')}</b><p>${tr('campaign1s')}</p></div><a class="btn tiny" href="${hash('studio/mug')}">${tr('start')}</a></div><div class="card promo"><div><span class="pill">♡</span><b style="display:block;margin-top:20px">${tr('campaign2')}</b><p>${tr('campaign2s')}</p></div><a class="btn tiny" href="${hash('studio/keychain')}">${tr('start')}</a></div><div class="card promo"><div><span class="pill">✧</span><b style="display:block;margin-top:20px">${tr('campaign3')}</b><p>${tr('campaign3s')}</p></div><a class="btn tiny" href="${hash('studio/giftbox')}">${tr('start')}</a></div></div><div class="section">${categoryGrid()}</div></main>`}
+function templatesPage(){return `<main class="max"><div class="pagehead"><div class="eyebrow">EJDER STYLE COLLECTION</div><h1>${tr('allTemplates')}</h1><p>${tr('allTemplatesText')}</p></div>${stage3d()}${templateGrid()}<div class="section"><h2 class="section-title">${tr('productChoice')}</h2>${categoryGrid()}</div></main>`}
+function savedPage(){const items=getSaved();return `<main class="max"><div class="pagehead"><div class="eyebrow">EJDER LOCAL GALLERY</div><h1>${tr('savedHead')}</h1><p>${tr('savedDesc')}</p></div>${stage3d(items.length?[...new Set(items.map(it=>it.product))]:null)}${items.length?`<div class="saved-grid">${items.map(it=>`<article class="card saved-item"><img src="${it.snapshot}" alt="${escapeHTML(it.product)}"><h3>${escapeHTML(name(product(it.product)))}</h3><div class="muted small">${tr('date')}: ${escapeHTML(new Date(it.date).toLocaleDateString(language==='de'?'de-DE':'tr-TR'))}</div><div class="actions"><button class="btn tiny" data-open-project="${escapeHTML(it.id)}">${tr('open')}</button><button class="btn danger tiny" data-delete-project="${escapeHTML(it.id)}">${tr('delete')}</button></div></article>`).join('')}</div>`:`<div class="text-panel card"><p>${tr('noSaved')}</p><a class="btn" href="${hash('studio/mug')}">${tr('start')}</a></div>`}</main>`}
+function infoPage(type){let title=tr(type==='about'?'aboutTitle':type==='legal'?'legalTitle':'contactTitle');let msg=tr(type==='about'?'aboutP':type==='legal'?'legalP':'contactP');return `<main class="max"><div class="pagehead"><div class="eyebrow">EJDER ✦ STUDIO</div><h1>${title}</h1></div>${stage3d(type==='contact'?['giftbox']:type==='legal'?['poster']:null)}<div class="text-panel card"><p>${msg}</p>${type==='contact'?`<div class="contact-form"><label>${tr('name')}<input disabled placeholder="${tr('name')}"></label><label>${tr('email')}<input disabled placeholder="${tr('email')}"></label><label>${tr('message')}<textarea disabled placeholder="${tr('message')}"></textarea></label><button class="btn" disabled>${tr('contactDisabled')}</button></div>`:type==='about'?`<div class="steps" style="margin-top:30px"><div class="card step"><span class="stepnum">1</span><div><h3>${tr('aboutCard1')}</h3><p>${tr('aboutCard1p')}</p></div></div><div class="card step"><span class="stepnum">2</span><div><h3>${tr('aboutCard2')}</h3><p>${tr('aboutCard2p')}</p></div></div><div class="card step"><span class="stepnum">3</span><div><h3>${tr('aboutCard3')}</h3><p>${tr('aboutCard3p')}</p></div></div></div>`:''}</div></main>`}
 
 /* ------------------------------------------------------------
    EJDER Studio: complete interactive demo, deliberately local.
@@ -218,7 +256,8 @@ function studioPage(){
         <div class="editor-templates">${TEMPLATE_IDS.map((id,i)=>`<button type="button" data-template="${id}" class="template-btn ${editor.template===id?'active':''}"><span aria-hidden="true">${TEMPLATE_ICONS[i]}</span>${tr('template_'+id)}</button>`).join('')}</div>
       </section>
       <aside class="card studio-preview"><h2>◉ ${tr('preview')}</h2>
-        <div class="preview-frame"><canvas id="studioPreview" width="450" height="325" aria-label="${tr('preview')}"></canvas></div>
+        <div class="flip3d" id="flip3d" style="--fy:${flipY}deg"><div class="flip3d-inner"><div class="flip3d-face flip3d-front"><div class="preview-frame"><canvas id="studioPreview" width="450" height="325" aria-label="${tr('preview')}"></canvas></div></div><div class="flip3d-face flip3d-back"><img src="${AS+editor.product}.webp" alt="${escapeHTML(name(choice))}" width="480" height="332" draggable="false"></div></div></div>
+        <div class="flip3d-tools"><button type="button" class="btn secondary tiny" data-flip="toggle" aria-pressed="${flipBack()}">${flipBack()?words('↻ Tasarımını gör','↻ Dein Design ansehen'):words('↻ Gerçek ürünü gör','↻ Echtes Produkt ansehen')}</button><small>${words('Kartı sürükleyerek 3D çevir','Karte ziehen, um sie in 3D zu drehen')}</small></div>
         <div class="controlgroup"><h3>${words('Seçilen ürün','Gewähltes Produkt')}</h3><img loading="lazy" src="${AS+editor.product}.webp" alt="${escapeHTML(name(choice))}" class="product-preview-image"><p>${escapeHTML(name(choice))}</p></div>
         <div class="controlgroup"><h3>${words('Fotoğraf gizliliği','Foto-Datenschutz')}</h3><p>${words('Fotoğraflar hiçbir sunucuya veya kalıcı depoya yüklenmez. Tasarımı kaydedince yalnızca yazı/renk bilgileri kalır. PNG indirince fotoğraflar tarayıcı belleğinden temizlenir.','Fotos werden nicht an Server oder dauerhafte Speicher übertragen. Beim Speichern bleiben nur Text und Farben. Nach dem PNG-Download werden Fotos aus dem Browser-Speicher entfernt.')}</p></div>
         <div class="studio-panel-actions"><button class="btn secondary tiny" type="button" data-action="save">▣ ${tr('save')}</button><button class="btn tiny" type="button" data-action="download">↓ PNG</button></div>
@@ -505,6 +544,7 @@ function render(){
   ROOT.innerHTML=header()+main+footer();
   document.documentElement.lang=language;
   if(page==='studio'){drawStudio();attachCanvasPointer();updateControlValues();}
+  mountShowcase();
   activeRoute=window.location.hash||'#/';
 }
 
@@ -518,6 +558,10 @@ ROOT.addEventListener('click', ev=>{
   const openProject=ev.target.closest('[data-open-project]');
   const delProject=ev.target.closest('[data-delete-project]');
   const tool=ev.target.closest('[data-tool]');
+  const ringBtn=ev.target.closest('[data-ring]');
+  if(ringBtn){window.EJDERRing?.rotate(Number(ringBtn.dataset.ring)||1);return;}
+  if(ev.target.closest('[data-flip]')){flipY=Math.round(flipY/180)*180+180;applyFlip();return;}
+  if(!action&&ev.target.closest('.gift-stage')){document.querySelector('[data-action="gift-toggle"]')?.click();return;}
   if(lang){language=lang.dataset.lang==='de'?'de':'tr';writeStore('ejder_lang',language);render();return;}
   if(bcolor){rememberUndo();editor.productColor=bcolor.dataset.color;refreshStudio();return;}
   if(template){applyTemplate(template.dataset.template);return;}
@@ -588,6 +632,33 @@ ROOT.addEventListener('change',ev=>{
   if(['sizeInput','angleInput','textColorInput','textInput'].includes(el.id)){
     const l=selectedLayer();if(l){const i=editor.layers.findIndex(x=>x.id===l.id);if(i>=0)refreshStudio();}return;
   }
+});
+ROOT.addEventListener('pointerdown',ev=>{
+  const card=ev.target.closest('#flip3d');if(!card||ev.button!==0)return;
+  flipDrag={x:ev.clientX,id:ev.pointerId,start:flipY,moved:0};
+});
+ROOT.addEventListener('pointermove',ev=>{
+  const card=document.getElementById('flip3d');
+  if(flipDrag&&card&&ev.pointerId===flipDrag.id){
+    const dx=ev.clientX-flipDrag.x;flipDrag.moved=Math.max(flipDrag.moved,Math.abs(dx));
+    if(flipDrag.moved>4){card.classList.add('dragging');try{card.setPointerCapture(ev.pointerId)}catch{}flipY=flipDrag.start+dx*.7;applyFlip();}
+    return;
+  }
+  if(ev.pointerType!=='mouse')return;
+  const hover=ev.target.closest('#flip3d,.gift-stage');
+  if(hover){const r=hover.getBoundingClientRect(),x=(ev.clientX-r.left)/r.width-.5,y=(ev.clientY-r.top)/r.height-.5;
+    const t=hover.id==='flip3d'?hover:hover.querySelector('.gift-scene');
+    if(t){t.style.setProperty('--tx',(-y*10).toFixed(2)+'deg');t.style.setProperty('--ty',(x*14).toFixed(2)+'deg');}}
+});
+for(const type of ['pointerup','pointercancel'])ROOT.addEventListener(type,ev=>{
+  if(!flipDrag||ev.pointerId!==flipDrag.id)return;
+  const card=document.getElementById('flip3d');const moved=flipDrag.moved;flipDrag=null;
+  if(card)card.classList.remove('dragging');
+  if(moved>4){flipY=Math.round(flipY/180)*180;applyFlip();}
+});
+ROOT.addEventListener('pointerout',ev=>{
+  const el=ev.target.closest?.('#flip3d,.gift-stage');if(!el||el.contains(ev.relatedTarget))return;
+  const t=el.id==='flip3d'?el:el.querySelector('.gift-scene');if(t){t.style.setProperty('--tx','0deg');t.style.setProperty('--ty','0deg');}
 });
 window.addEventListener('hashchange',()=>{
   const now=currentRoute();
