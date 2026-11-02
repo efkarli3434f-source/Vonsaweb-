@@ -36,7 +36,7 @@ function spawn(p, anywhere) {
 }
 function resize() {
   const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-  W = window.innerWidth || 1; H = window.innerHeight || 1;
+  W = document.documentElement.clientWidth || window.innerWidth || 1; H = document.documentElement.clientHeight || window.innerHeight || 1;
   canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
   canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

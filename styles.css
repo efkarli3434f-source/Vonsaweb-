@@ -24,7 +24,7 @@
 /* Avoid drifting hit targets on touch devices and during programmatic focus. */
 html{scroll-behavior:auto}
 /* ================= 3D layer – only real content (ambient3d.js, showcase3d.js, app.js) ================= */
-#bg3d{position:fixed;inset:0;z-index:0;pointer-events:none}
+#bg3d{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 #bg3d canvas{display:block}
 #app{position:relative;z-index:1}
 /* 3D showcase: the real product photos in CSS 3D space – never filtered, cropped or stretched */
@@ -54,16 +54,17 @@ html{scroll-behavior:auto}
 .stage3d-nav button:hover{background:#4a1628;transform:translateY(-1px)}
 /* gift: the real gift box photo in 3D; opening it releases the real product photos */
 .gift-stage.photo3d{perspective:900px;height:320px;cursor:pointer;user-select:none;-webkit-user-select:none}
-.gift-scene{position:relative;width:min(300px,78%);aspect-ratio:480/332;transform-style:preserve-3d;transform:rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg));transition:transform .3s ease-out}
+.gift-scene{position:relative;width:min(300px,78%);max-width:100%;aspect-ratio:480/332;transform-style:preserve-3d;transform:rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg));transition:transform .3s ease-out,scale .8s cubic-bezier(.2,.8,.2,1)}
+.gift-stage.opened .gift-scene{scale:.8}
 .gift-card{position:absolute;inset:0;border-radius:12px;overflow:hidden;border:1px solid #d6a46a99;background:#1b070f;box-shadow:0 18px 40px #000a}
 .gift-card img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
 .gift-box-card{transform:translateZ(0);transition:transform 1s cubic-bezier(.2,.8,.2,1)}
 .gift-item{opacity:0;transform:translateZ(-80px) scale(.5);transition:transform .9s cubic-bezier(.2,.8,.2,1),opacity .35s}
 .gift-stage.opened .gift-box-card{transform:translateY(34%) translateZ(-70px) rotateX(16deg) scale(.76)}
 .gift-stage.opened .gift-item{opacity:1;transition-delay:calc(.15s + var(--k,0) * .12s)}
-.gift-stage.opened .gift-item:nth-child(2){transform:translate(-58%,-24%) translateZ(10px) rotateY(26deg) rotateZ(-5deg) scale(.6)}
-.gift-stage.opened .gift-item:nth-child(3){transform:translate(0,-42%) translateZ(40px) scale(.66)}
-.gift-stage.opened .gift-item:nth-child(4){transform:translate(58%,-24%) translateZ(10px) rotateY(-26deg) rotateZ(5deg) scale(.6)}
+.gift-stage.opened .gift-item:nth-child(2){transform:translate(-52%,-22%) translateZ(10px) rotateY(24deg) rotateZ(-5deg) scale(.52)}
+.gift-stage.opened .gift-item:nth-child(3){transform:translate(0,-44%) translateZ(40px) scale(.58)}
+.gift-stage.opened .gift-item:nth-child(4){transform:translate(52%,-22%) translateZ(10px) rotateY(-24deg) rotateZ(5deg) scale(.52)}
 @keyframes ejderFloat{0%,100%{translate:0 0}50%{translate:0 -7px}}
 .gift-stage.photo3d:not(.opened) .gift-box-card{animation:ejderFloat 4.5s ease-in-out infinite}
 /* studio: 3D card – front: the site's own live preview, back: the real product photo */
@@ -80,3 +81,26 @@ html{scroll-behavior:auto}
 @media(max-width:900px){.stage3d{grid-template-columns:1fr}.stage3d-caption{border-left:0;border-top:1px solid #b8814855;padding:18px}.stage3d-view{min-height:320px}}
 @media(max-width:650px){.stage3d-caption b{font-size:28px}.gift-stage.photo3d{height:300px}}
 @media(prefers-reduced-motion:reduce){.is-pair .ring-card,.gift-item,.gift-box-card,.flip3d-inner,.gift-scene{transition:none}.gift-stage.photo3d .gift-box-card{animation:none}}
+/* ================= overflow fixes on narrow screens ================= */
+@media(max-width:650px){.hero h1{font-size:min(58px,calc((100vw - 80px) / 5.8))}}
+@media(max-width:360px){.brand img{width:150px;top:-3px}}
+@media(max-width:380px){
+  .category-card .card-body{gap:6px;padding:12px 10px}
+  .category-card h3{font-size:18px}
+  .template-show h3{font-size:22px}
+}
+.step>div{min-width:0;overflow-wrap:break-word}
+/* ================= footer ================= */
+.max.foot-bottom{padding-block:18px;padding-left:clamp(16px,3.5vw,54px);padding-right:clamp(16px,3.5vw,54px)}
+.foot .footer-cols>div:not(:first-child) h3{white-space:nowrap;font-size:clamp(20px,2.1vw,27px)}
+@media(max-width:900px){
+  .footer-cols{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 20px}
+  .footer-cols>div:first-child{grid-column:1/-1}
+  .foot .footer-cols>div:not(:first-child) h3{font-size:clamp(19px,3.2vw,26px)}
+}
+@media(max-width:650px){
+  .footer-cols{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 20px}
+  .footer-cols>div:last-child{grid-column:1/-1}
+  .footer-cols>div:last-child ul{columns:2;column-gap:20px}
+  .foot .footer-cols>div:not(:first-child) h3{font-size:clamp(17px,5.3vw,22px)}
+}

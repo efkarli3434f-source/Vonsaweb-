@@ -93,8 +93,9 @@ function mount(root, opts = {}) {
 function layout(s) {
   const W = s.root.clientWidth || 600, H = s.root.clientHeight || 360;
   let cw;
-  if (s.pair) cw = clamp(Math.min(W / (s.n * 1.22 + .7), (H * .66) / .6917), 130, 340);
-  else cw = clamp(Math.min(W * .3, (H * .62) / .6917), 120, 270);
+  // the whole row/ring must stay inside the view: pair row ≈ ((n-1)·1.12 + 1.15)·cw wide, ring ≈ 2.7·cw wide
+  if (s.pair) cw = clamp(Math.min(W * .92 / ((s.n - 1) * 1.12 + 1.15), (H * .66) / .6917), 70, 340);
+  else cw = clamp(Math.min(W / 2.75, W * .3, (H * .62) / .6917), 70, 270);
   s.radius = s.pair ? 0 : (cw / 2) / Math.tan(Math.PI / s.n) * 1.1;
   s.root.style.setProperty('--cw', cw.toFixed(1) + 'px');
   s.root.style.setProperty('--r', s.radius.toFixed(1) + 'px');
