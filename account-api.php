@@ -11,6 +11,7 @@ header("Content-Security-Policy: default-src 'none'; frame-ancestors 'none'");
 const EJDER_ORIGIN = 'https://ejderstudio.com';
 const EJDER_CALLBACK = EJDER_ORIGIN . '/account-api.php?action=callback';
 $configPath = dirname(__DIR__) . '/EJDER_CONFIG/google.php';
+if (!@is_file($configPath) && @is_file(__DIR__ . '/EJDER_CONFIG/google.php')) $configPath = __DIR__ . '/EJDER_CONFIG/google.php';
 $config = is_file($configPath) ? require $configPath : [];
 if (!is_array($config)) $config = [];
 $clientId = (string)($config['client_id'] ?? (getenv('EJDER_GOOGLE_CLIENT_ID') ?: ''));

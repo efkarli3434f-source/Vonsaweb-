@@ -2,6 +2,26 @@
 declare(strict_types=1);
 // Shared server-side rules. No client-submitted price or role is trusted.
 if (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) {http_response_code(404); exit;}
+// Private folders live next to the site folder (preferred). Hosting plans whose domain points at the
+// webspace root cannot write there; then a folder inside the site is used, blocked by .htaccess and
+// holding only PHP files that answer 404. Existing data next to the site always wins.
+function ejderPrivateDir(string $name): string {
+    $outside=dirname(__DIR__).'/'.$name; $inside=__DIR__.'/'.$name;
+    if (@is_dir($outside)) return $outside;
+    if (@is_dir($inside)) return $inside;
+    return @is_writable(dirname(__DIR__)) ? $outside : $inside;
+}
+function ejderConfigFile(string $file): string {
+    foreach ([dirname(__DIR__), __DIR__] as $base) { $path=$base.'/EJDER_CONFIG/'.$file; if (@is_file($path)) return $path; }
+    return dirname(__DIR__).'/EJDER_CONFIG/'.$file;
+}
+// Same-site check for state-changing requests: the live domain (with or without www) or the host serving this request.
+function ejderOriginAllowed(): bool {
+    $origin=(string)($_SERVER['HTTP_ORIGIN'] ?? ''); $host=strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+    $allowed=['https://ejderstudio.com','https://www.ejderstudio.com'];
+    if ($host!=='' && preg_match('/^[a-z0-9.-]+(:[0-9]{1,5})?$/',$host)) $allowed[]='https://'.$host;
+    return in_array($origin,$allowed,true);
+}
 final class ShopError extends RuntimeException {public int $status; public function __construct(string $code,int $status=400){parent::__construct($code);$this->status=$status;}}
 final class EjderShop {
     private string $dir;

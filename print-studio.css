@@ -31,3 +31,9 @@
   .pr-grid{grid-template-columns:1fr}
   .pr-preview canvas{max-height:38vh}
 }
+/* Phone case brands on the cases page */
+.case-brands{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:14px 0 0}
+.case-brands button{cursor:pointer;font:inherit;display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border:1px solid #b17b50;border-radius:40px;color:#ffdfab;text-decoration:none;font-size:13px;background:#200a12}
+.case-brands button span{font-size:11px;color:#d9b9ad}
+.case-brand{scroll-margin-top:90px}
+.case-brand>h2{margin:26px 0 12px;font:600 clamp(20px,3vw,27px)/1.2 Georgia,"Times New Roman",serif;color:#ffe6b5;text-align:center}

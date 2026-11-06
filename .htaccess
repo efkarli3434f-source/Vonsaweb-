@@ -1,0 +1,32 @@
+# EJDER Studio · Apache (STRATO) ayarları / Einstellungen
+# Yalnız paylaşımlı hostinglerde izin verilen komutlar kullanıldı.
+# Nur Befehle, die auf Shared Hosting erlaubt sind.
+
+AddDefaultCharset utf-8
+AddType application/manifest+json .webmanifest
+AddType image/webp .webp
+AddType text/javascript .js
+AddType application/json .json
+AddType application/octet-stream .bin
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Özel veri ve ayar klasörleri asla gösterilmez / Private Ordner niemals ausliefern
+  RewriteRule ^(EJDER_SHOP_DATA|EJDER_CONFIG)(/|$) - [F,L]
+
+  # HTTPS'e yönlendirme: STRATO'da SSL etkinleştirildikten sonra alttaki 2 satırın başındaki # işaretini sil.
+  # HTTPS-Weiterleitung: Nach Aktivierung von SSL bei STRATO bei den 2 Zeilen unten das # entfernen.
+  # RewriteCond %{HTTPS} !=on
+  # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+# Güncellemeler ziyaretçiye hemen ulaşsın / Updates sofort ausliefern
+<IfModule mod_headers.c>
+  <FilesMatch "^(sw\.js|index\.html|de\.html|manifest\.webmanifest)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json application/manifest+json image/svg+xml text/plain
+</IfModule>

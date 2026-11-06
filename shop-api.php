@@ -23,7 +23,7 @@ try {
     ini_set('session.use_strict_mode','1');ini_set('session.use_only_cookies','1');session_name('__Host-ejder_shop');session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>true,'httponly'=>true,'samesite'=>'Strict']);session_start();
     if(!isset($_SESSION['csrf']))$_SESSION['csrf']=bin2hex(random_bytes(32));
     if(isset($_SESSION['admin'])&&time()-$_SESSION['admin']>3600){unset($_SESSION['admin']);session_regenerate_id(true);}
-    $shop=new EjderShop(dirname(__DIR__).'/EJDER_SHOP_DATA');
+    $shop=new EjderShop(ejderPrivateDir('EJDER_SHOP_DATA'));
     if(isset($_SESSION['admin'])){
         $valid=$shop->transact(fn(&$db)=>$db['admin']!==null&&($_SESSION['adminVersion']??1)===($db['admin']['authVersion']??1));
         if(!$valid){session_regenerate_id(true);$_SESSION=['csrf'=>bin2hex(random_bytes(32))];}
@@ -33,11 +33,11 @@ try {
     if(!in_array($action,array_merge($get,$post),true))throw new ShopError('not_found',404);
     if(($_SERVER['REQUEST_METHOD']??'GET')!==(in_array($action,$get,true)?'GET':'POST'))throw new ShopError('method_not_allowed',405);
     if(in_array($action,$post,true)){
-        if(($_SERVER['HTTP_ORIGIN']??'')!=='https://ejderstudio.com'||!hash_equals($_SESSION['csrf'],(string)($_SERVER['HTTP_X_CSRF_TOKEN']??'')))throw new ShopError('forbidden',403);
+        if(!ejderOriginAllowed()||!hash_equals($_SESSION['csrf'],(string)($_SERVER['HTTP_X_CSRF_TOKEN']??'')))throw new ShopError('forbidden',403);
         $ip=(string)($_SERVER['REMOTE_ADDR']??'');$limit=in_array($action,['login','setup-start','setup-finish','twofactor-start','twofactor-finish','password-reset','password-recovery'],true)?10:120;
         $limited=$shop->transact(function(&$db)use($ip,$action,$limit){return EjderShop::limited($db,hash_hmac('sha256',$action.'|'.$ip,$db['secret']),$limit,900);});if($limited)throw new ShopError('retry_later',429);
     }
-    $setupConfig=dirname(__DIR__).'/EJDER_CONFIG/shop-setup.php';$config=is_file($setupConfig)?require $setupConfig:[];if(!is_array($config))$config=[];
+    $setupConfig=ejderConfigFile('shop-setup.php');$config=is_file($setupConfig)?require $setupConfig:[];if(!is_array($config))$config=[];
     $setupTwoFactor=($config['password_only_setup']??false)!==true;
     $canSetup=isset($config['token_hash'],$config['expires'])&&time()<(int)$config['expires'];
     if($action==='catalog')respond($shop->transact(fn(&$db)=>['products'=>EjderShop::publicProducts($db),'settings'=>$db['settings'],'paymentsReady'=>false]));

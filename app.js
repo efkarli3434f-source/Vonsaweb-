@@ -15,7 +15,7 @@ const CATEGORIES=[
  {id:'cushion',tr:'Dekoratif Yastık',de:'Dekokissen',shortTr:'Kendi motifinle yumuşak bir dokunuş.',shortDe:'Dein Motiv auf weichem Stoff.'},
  {id:'giftbox',tr:'Hediye Kutusu',de:'Geschenkbox',shortTr:'Kutudan önce tasarım sürprizi.',shortDe:'Deine persönliche Geschenkbox.'}
 ];
-const CASE_MODELS=window.EJDERCaseCatalog.models.map(({id,model})=>({id,model,tr:model+' Kılıfı',de:model+' Hülle',shortTr:'Kılıf rengini ve baskını seç.',shortDe:'Wähle Hüllenfarbe und Motiv.'}));
+const CASE_MODELS=window.EJDERCaseCatalog.models.map(({id,model,brand})=>({id,model,brand,tr:model+' Kılıfı',de:model+' Hülle',shortTr:'Kılıf rengini ve baskını seç.',shortDe:'Wähle Hüllenfarbe und Motiv.'}));
 const PRODUCTS=[...CATEGORIES,...CASE_MODELS];
 const DEFAULT_CASE='case-s24';
 function productLink(id){return hash(id==='case'?'cases':'studio/'+id);}
@@ -217,7 +217,7 @@ function applyFlip(){
 function caseGallery(){
   return `<section class="section case-gallery"><div class="eyebrow">EJDER STUDIO</div><h2 class="section-title">${words('Telefon kılıfları','Handyhüllen')}</h2><p class="muted">${words('Telefon modelini seç. Kılıf rengini ve baskını tasarım alanında belirle.','Wähle dein Handymodell. Farbe und Motiv legst du im Studio fest.')}</p>${categoryGrid(CASE_MODELS)}</section>`;
 }
-function casesPage(){return `<main class="max"><div class="pagehead"><div class="eyebrow">EJDER STUDIO</div><h1>${words('Telefon kılıfları','Handyhüllen')}</h1><p>${words('Her kart bir telefon modeli. Modelini aç, rengini seç ve kendi tasarımını ekle.','Jede Karte zeigt ein Handymodell. Öffne dein Modell, wähle eine Farbe und ergänze dein Motiv.')}</p></div>${categoryGrid(CASE_MODELS)}</main>`;}
+function casesPage(){return `<main class="max"><div class="pagehead"><div class="eyebrow">EJDER STUDIO</div><h1>${words('Telefon kılıfları','Handyhüllen')}</h1><p>${words('Her kart bir telefon modeli. Modelini aç, rengini seç ve kendi tasarımını ekle.','Jede Karte zeigt ein Handymodell. Öffne dein Modell, wähle eine Farbe und ergänze dein Motiv.')}</p><nav class="case-brands" aria-label="${words('Markalar','Marken')}">${[...new Set(CASE_MODELS.map(m=>m.brand))].map(b=>`<button type="button" data-brand-jump="${b.toLowerCase()}">${escapeHTML(b)} <span>${CASE_MODELS.filter(m=>m.brand===b).length}</span></button>`).join('')}</nav></div>${[...new Set(CASE_MODELS.map(m=>m.brand))].map(b=>`<section class="case-brand" id="case-brand-${b.toLowerCase()}" aria-label="${escapeHTML(b)}"><h2>${escapeHTML(b)}</h2>${categoryGrid(CASE_MODELS.filter(m=>m.brand===b))}</section>`).join('')}</main>`;}
 function productsPage(){return `<main class="max"><div class="pagehead"><div class="eyebrow">${words('EJDER ÜRÜNLERİ','EJDER PRODUKTE')}</div><h1>${tr('productChoice')}</h1><p>${tr('categoriesText')}</p></div>${stage3d()}${categoryGrid(CATEGORIES.filter(p=>p.id!=='case'))}${caseGallery()}<div class="section"><h2 class="section-title">${tr('how')}</h2>${steps()}</div></main>`}
 function collectionsPage(id){const c=COLLECTIONS.find(x=>x.id===id)||COLLECTIONS[0]; const [p1,p2]=c.product.map(product);return `<main class="max"><section class="collection-head"><div><div class="eyebrow">${words('EJDER TASARIM ATÖLYESİ','EJDER DESIGNATELIER')}</div><h1>${language==='de'?c.de:c.tr}</h1><p>${tr('collectionDesc')}</p><a href="${productLink(p1.id)}" class="btn tiny">${tr('start')} ↗</a></div><div class="collection-pair" aria-hidden="true">${productPicture(p1.id)}${productPicture(p2.id)}</div></section>${stage3d(c.product)}<div class="duo-grid">${[p1,p2].map(p=>`<article class="card duo-card"><div class="duo-visual"><img src="${AS+p.id}.webp?v=6" alt="${escapeHTML(name(p))}"></div><div class="duo-text"><div><h2>${escapeHTML(name(p))}</h2><p>${escapeHTML(language==='de'?p.shortDe:p.shortTr)}</p></div><a class="btn" href="${productLink(p.id)}">${tr('designStart')} ↗</a></div></article>`).join('')}</div><div class="section"><h2 class="section-title">${tr('templateTitle')}</h2>${templateHighlights()}</div></main>`}
 function campaignsPage(){return `<main class="max"><div class="pagehead"><span class="eyebrow">${words('EJDER İLHAM SERİSİ','EJDER INSPIRATION')}</span><h1>${tr('campaigns')}</h1><p>${tr('campaignNote')}</p></div>${stage3d(['mug','keychain','giftbox'])}${promotions()}<div class="section">${categoryGrid()}</div></main>`}
@@ -1522,6 +1522,7 @@ ROOT.addEventListener('change',ev=>{
   }
 });
 ROOT.addEventListener('click',ev=>{
+  const brandJump=ev.target.closest?.('[data-brand-jump]');if(brandJump){document.getElementById('case-brand-'+brandJump.dataset.brandJump)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});return;}
   if(mobileOpen&&ev.target.closest('.mobilemenu a')){mobileOpen=false;ROOT.querySelector('.mobilemenu')?.classList.remove('open');ROOT.querySelector('.menu-btn')?.setAttribute('aria-expanded','false');}
 });
 document.addEventListener('keydown',ev=>{
