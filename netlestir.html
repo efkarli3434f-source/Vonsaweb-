@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>EJDER Studio · Netleştir & Atölyeye Gönder</title>
+<link rel="stylesheet" href="netlestir.css?v=7.11.1">
+<script defer src="netlestir.js?v=7.7"></script>
+<link rel="stylesheet" href="centered.css?v=7.11">
+<link rel="stylesheet" href="assets/brand-mask.css"></head>
+<body class="capture-centered">
+<div class="haze" aria-hidden="true"></div>
+<div class="page">
+<header class="header"><a href="index.html" class="brand" aria-label="EJDER Studio ana sayfa"><img src="assets/ejder_logo.webp" alt="EJDER Studio" width="240" height="134"></a><div class="lang"><button type="button" id="langTR" class="active" aria-pressed="true">TR</button><button type="button" id="langDE" aria-pressed="false">DE</button></div></header>
+<main>
+<div class="intro"><span class="kicker" data-tr="MÜŞTERİ TASARIM ATÖLYESİ" data-de="DESIGN-WERKSTATT FÜR KUNDEN">MÜŞTERİ TASARIM ATÖLYESİ</span>
+<h1><span data-tr="Kaydından" data-de="Aus deiner Aufnahme">Kaydından</span> <em data-tr="baskıya daha net." data-de="ein klareres Druckmotiv.">baskıya daha net.</em></h1>
+<p data-tr="Ekran görüntüsünü aç veya videodan tek kare (snapshot) seç. İstediğin alanı kırp, küçük izleri temizle ve sonucu PNG indir. Videonun tamamı düzenlenmez; dosyan cihazında işlenir." data-de="Öffne einen Screenshot oder wähle einen einzelnen Videoframe (Snapshot). Schneide ihn zu, entferne kleine Stellen und lade das Ergebnis als PNG herunter. Das gesamte Video wird nicht bearbeitet; die Datei bleibt auf deinem Gerät.">Ekran görüntüsünü aç veya videodan tek kare (snapshot) seç. İstediğin alanı kırp, küçük izleri temizle ve sonucu PNG indir. Videonun tamamı düzenlenmez; dosyan cihazında işlenir.</p>
+</div>
+<div class="layout">
+<section class="panel work"><div class="panel-head"><span class="num">01</span><h2 data-tr="Görselini seç" data-de="Datei auswählen">Görselini seç</h2></div>
+<label class="drop" for="userFile"><span class="drop-icon">↑</span><strong data-tr="Ekran görüntüsü veya videosu yükle" data-de="Screenshot oder Bildschirmvideo auswählen">Ekran görüntüsü veya videosu yükle</strong><small>PNG · JPG · WebP · MP4 · WebM</small><input type="file" id="userFile" accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime"></label>
+<div id="videoTools" hidden class="video-tools"><label><span data-tr="Videodaki kare" data-de="Videoframe">Videodaki kare</span><input type="range" id="frameRange" min="0" max="1" value="0" step="0.05"></label><div class="action-row"><button type="button" id="autoFrame" class="secondary" data-tr="En net kareyi bul" data-de="Schärfsten Frame suchen">En net kareyi bul</button><button type="button" id="pickFrame" class="secondary" data-tr="Bu kareyi seç" data-de="Frame übernehmen">Bu kareyi seç</button></div><small id="frameLabel">0.0 s</small></div>
+<video id="sourceVideo" playsinline muted preload="metadata" hidden></video>
+<div class="panel-head sub"><span class="num">02</span><h2 data-tr="Yalnız gereken alan" data-de="Nur den wichtigen Bereich">Yalnız gereken alan</h2></div>
+<p class="hint" data-tr="Görsel üzerinde parmağınla sarı kırpma alanını çiz. İstersen kırmızıyla küçük simgeleri işaretle; temizleme bu yerleri yaklaşık doldurur." data-de="Ziehe den gelben Ausschnitt mit dem Finger. Kleine Symbole lassen sich rot markieren; deren Entfernung wird nur näherungsweise berechnet.">Görsel üzerinde parmağınla sarı kırpma alanını çiz. İstersen kırmızıyla küçük simgeleri işaretle; temizleme bu yerleri yaklaşık doldurur.</p>
+<div class="action-row"><button type="button" id="cropBtn" class="secondary selected" data-tr="Kırp" data-de="Zuschneiden">Kırp</button><button type="button" id="patchBtn" class="secondary" data-tr="Küçük alan temizle" data-de="Kleine Stellen entfernen">Küçük alan temizle</button><button type="button" id="trimBtn" class="secondary" data-tr="Kenarı otomatik kes" data-de="Rand automatisch erkennen">Kenarı otomatik kes</button><button type="button" id="undoBtn" class="secondary" data-tr="Geri al" data-de="Rückgängig">Geri al</button><button type="button" id="resetBtn" class="secondary" data-tr="Sıfırla" data-de="Zurücksetzen">Sıfırla</button></div>
+<div class="stage"><canvas id="stage" width="850" height="470" aria-label="Kırpma alanını sürükleyerek seç"></canvas></div><small id="selectInfo" class="detail" aria-live="polite">Bir görsel seç / Bild auswählen</small>
+<div class="panel-head sub"><span class="num">03</span><h2 data-tr="Netlik ayarları" data-de="Bildverbesserung">Netlik ayarları</h2></div>
+<div class="sliders"><label><span data-tr="Keskinlik" data-de="Schärfe">Keskinlik</span><output id="sharpVal">35%</output><input type="range" id="sharp" min="0" max="100" value="35"></label>
+<label><span data-tr="Parazit azaltma" data-de="Rauschreduzierung">Parazit azaltma</span><output id="noiseVal">15%</output><input type="range" id="noise" min="0" max="80" value="15"></label>
+<label><span data-tr="Kontrast" data-de="Kontrast">Kontrast</span><output id="contrastVal">105%</output><input type="range" id="contrast" min="90" max="125" value="105"></label></div>
+<button type="button" id="improveBtn" class="gold" data-tr="Görseli netleştir ve karşılaştır" data-de="Bild verbessern und vergleichen">Görseli netleştir ve karşılaştır</button>
+<div class="compare"><div><strong data-tr="Önce" data-de="Vorher">Önce</strong><canvas id="before" width="440" height="310"></canvas></div><div><strong data-tr="Sonra" data-de="Nachher">Sonra</strong><canvas id="after" width="440" height="310"></canvas></div></div>
+<div class="action-row"><button type="button" id="downloadBtn" class="gold" disabled data-tr="Temiz sonucu PNG indir" data-de="Bereinigtes PNG herunterladen">Temiz sonucu PNG indir</button><button type="button" id="clearFileBtn" class="secondary" data-tr="İşlemi bitir · Dosyayı temizle" data-de="Beenden · Datei entfernen">İşlemi bitir · Dosyayı temizle</button></div>
+<p class="hint" data-tr="PNG indirildiğinde geçici video ve görsel kopyaları bu sayfadan temizlenir. Kaynak dosyan cihazında kalır." data-de="Nach dem PNG-Download werden temporäre Video- und Bildkopien aus dieser Seite entfernt. Die Originaldatei bleibt auf deinem Gerät.">PNG indirildiğinde geçici video ve görsel kopyaları bu sayfadan temizlenir. Kaynak dosyan cihazında kalır.</p>
+<p class="warning" data-tr="Dikkat: Keskinleştirme görüntüyü daha okunur kılabilir ama eksik detayları geri getiremez. Parlaklık/renk ile baskı rengi ayrıca kontrol edilir." data-de="Wichtig: Schärfen kann die Darstellung verbessern, aber keine verlorenen Details wiederherstellen. Druckfarben müssen separat geprüft werden.">Dikkat: Keskinleştirme görüntüyü daha okunur kılabilir ama eksik detayları geri getiremez. Parlaklık/renk ile baskı rengi ayrıca kontrol edilir.</p>
+</section>
+<aside class="panel order"><div class="panel-head"><span class="num">04</span><h2 data-tr="Beğendin mi? Bize gönder" data-de="Gefällt es dir? Einsenden">Beğendin mi? Bize gönder</h2></div>
+<p data-tr="Görüntünün sadece seçtiğin temizlenmiş kısmını baskı incelemesi için gönderirsin. Videonun tamamı cihazından çıkmaz." data-de="Nur der von dir ausgewählte, bearbeitete PNG-Ausschnitt wird zur Prüfung gesendet. Das Video bleibt auf deinem Gerät.">Görüntünün sadece seçtiğin temizlenmiş kısmını baskı incelemesi için gönderirsin. Videonun tamamı cihazından çıkmaz.</p>
+<label><span data-tr="Ürün" data-de="Produkt">Ürün</span><select id="product"><option value="case" data-tr="Telefon kılıfı" data-de="Handyhülle">Telefon kılıfı</option><option value="mug" data-tr="Kupa" data-de="Tasse">Kupa</option><option value="shirt" data-tr="Tişört" data-de="T-Shirt">Tişört</option><option value="hoodie" data-tr="Hoodie / Sweatshirt" data-de="Hoodie / Sweatshirt">Hoodie / Sweatshirt</option><option value="tote" data-tr="Bez çanta" data-de="Stofftasche">Bez çanta</option><option value="cushion" data-tr="Yastık" data-de="Kissen">Yastık</option><option value="poster" data-tr="Poster" data-de="Poster">Poster</option><option value="keychain" data-tr="Anahtarlık" data-de="Schlüsselanhänger">Anahtarlık</option><option value="giftbox" data-tr="Hediye kutusu" data-de="Geschenkbox">Hediye kutusu</option></select></label>
+<label><span data-tr="Hedef baskı genişliği — yaklaşık (mm)" data-de="Geplante Druckbreite — ungefähr (mm)">Hedef baskı genişliği — yaklaşık (mm)</span><input type="number" id="targetMM" min="10" max="600" step="1" value="100"><small data-tr="Kesin ölçüyü atölyede makinemize göre belirleyeceğiz." data-de="Das endgültige Druckmaß bestimmt die Werkstatt anhand der Maschine.">Kesin ölçüyü atölyede makinemize göre belirleyeceğiz.</small></label>
+<div class="quality" id="quality" aria-live="polite">—</div>
+<label><span data-tr="Yanıt için e-posta" data-de="E-Mail für Rückfragen">Yanıt için e-posta</span><input type="email" id="email" autocomplete="email" maxlength="120" placeholder="ornek@example.com" required></label>
+<label class="consent"><input type="checkbox" id="consent"><span data-tr="Bu görseli paylaşma hakkım var. Seçtiğim PNG'nin inceleme için şifreli saklanmasını ve 48 saatlik saklama süresi dolduğunda otomatik silinmesini kabul ediyorum." data-de="Ich darf das Bild verwenden. Ich stimme zu, dass die ausgewählte PNG-Datei verschlüsselt zur Prüfung gespeichert und nach Ablauf der Aufbewahrungsfrist von 48 Stunden automatisch gelöscht wird.">Bu görseli paylaşma hakkım var. Seçtiğim PNG'nin inceleme için şifreli saklanmasını ve 48 saatlik saklama süresi dolduğunda otomatik silinmesini kabul ediyorum.</span></label>
+<button type="button" id="sendBtn" class="gold" disabled data-tr="Atölye gönderimi henüz bağlı değil" data-de="Werkstattversand noch nicht verbunden">Atölye gönderimi henüz bağlı değil</button>
+<p id="workshopNotice" class="hint" data-tr="Gönderim henüz açık değil. Temizlenen görüntüyü PNG olarak cihazına indirebilirsin." data-de="Der Versand ist noch nicht verfügbar. Du kannst das bearbeitete Bild als PNG auf dein Gerät herunterladen.">Gönderim henüz açık değil. Temizlenen görüntüyü PNG olarak cihazına indirebilirsin.</p>
+<div class="status" id="status" role="status" aria-live="polite" data-tr="Henüz dosya seçilmedi." data-de="Noch keine Datei ausgewählt.">Henüz dosya seçilmedi.</div>
+<p class="footnote" data-tr="Baskı için uygunluğu dosyaya, gerçek ölçüye ve makineye göre kontrol edeceğiz. Gönderim sipariş veya ödeme değildir." data-de="Wir prüfen Datei, Maße und Druckgerät. Das Senden ist weder Bestellung noch Zahlung.">Baskı için uygunluğu dosyaya, gerçek ölçüye ve makineye göre kontrol edeceğiz. Gönderim sipariş veya ödeme değildir.</p>
+</aside>
+</div>
+</main>
+<footer>✦ EJDER Studio <span data-tr="· Tasarımını güvenle hazırla" data-de="· Design sicher vorbereiten">· Tasarımını güvenle hazırla</span></footer>
+</div>
+</body>
+</html>

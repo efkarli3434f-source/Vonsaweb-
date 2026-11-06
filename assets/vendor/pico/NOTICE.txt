@@ -1,0 +1,10 @@
+EJDER V7.19 local face-position detector
+No face recognition, no image uploads.
+
+pico.js: https://github.com/nenadmarkus/picojs (MIT)
+Cascade: https://github.com/nenadmarkus/pico/tree/master/rnt/cascades (MIT, Copyright 2013 Nenad Markus)
+Retrieved 2026-11-05. Model and runtime are bundled and served from this site only.
+
+assets/vendor/pico/pico.js SHA256 785b981cc79e5fa3f7557dc3fa7773629d7529994d7627de41b77d8687649309
+assets/vendor/pico/facefinder.bin SHA256 d8014993e7298c7b1865d1f8b855d6dbf4ec5c808bf879e2091ab6837abf90cd
+assets/vendor/pico/LICENSE SHA256 3769f26981094bcd4e45134dc3101f9e2fbde28c2bfe15534557b4c089f2f521

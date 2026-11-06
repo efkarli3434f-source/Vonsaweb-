@@ -1,0 +1,18 @@
+/* V7.30: visual instructions only; homepage hero and editor are independent. */
+.visual-steps{list-style:none;padding:0;margin:0;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.visual-steps .visual-step{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr;justify-content:stretch;gap:12px;min-width:0;padding:18px 16px 22px;border-color:#c18b456b;background:linear-gradient(160deg,#290b16,#18080f);border-radius:22px;align-items:start;justify-items:center}
+.guide-art{position:relative;width:min(100%,310px);aspect-ratio:560 / 380;overflow:hidden;border-radius:10px;isolation:isolate}
+.guide-art img{position:absolute;display:block;width:342.857143%;max-width:none;height:auto;top:-52.631579%;left:var(--guide-x);pointer-events:none;user-select:none}
+.guide-art-1{--guide-x:-11.071429%}.guide-art-2{--guide-x:-121.428571%}.guide-art-3{--guide-x:-231.785714%}
+.guide-copy{width:100%;min-width:0}
+.visual-steps .guide-copy h3{font-size:clamp(24px,2.2vw,32px);line-height:1.15;text-wrap:balance}
+.visual-steps .guide-copy p{font-size:13px;line-height:1.55;color:#dfc6b4;margin:9px auto 0;max-width:34ch;text-wrap:pretty}
+@media(min-width:701px) and (max-width:1000px){.visual-steps .guide-copy h3{min-height:2.3em}.visual-steps .visual-step{padding-inline:12px}}
+@media(max-width:700px){
+ .visual-steps{grid-template-columns:minmax(0,1fr);gap:12px}
+ .visual-steps .visual-step{grid-template-columns:minmax(90px,34%) minmax(0,1fr);grid-template-rows:auto;align-items:center;gap:13px;padding:14px 12px;border-radius:17px}
+ .guide-art{width:100%;max-width:170px}
+ .visual-steps .guide-copy h3{font-size:24px;line-height:1.1}
+ .visual-steps .guide-copy p{font-size:12px;line-height:1.45;margin-top:7px}
+}
+@media(max-width:360px){.visual-steps .visual-step{gap:9px;padding:12px 9px}.visual-steps .guide-copy h3{font-size:22px}.visual-steps .guide-copy p{font-size:11px}}

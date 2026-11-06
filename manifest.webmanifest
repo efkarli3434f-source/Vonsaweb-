@@ -1,0 +1,15 @@
+{
+  "id": "./",
+  "name": "EJDER Studio",
+  "short_name": "EJDER Studio",
+  "description": "Kişisel tasarım atölyesi · Persönliches Designatelier",
+  "start_url": "./index.html#/",
+  "scope": "./",
+  "display": "standalone",
+  "theme_color": "#210a14",
+  "background_color": "#17070d",
+  "icons": [
+    {"src": "assets/app-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "assets/app-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+  ]
+}

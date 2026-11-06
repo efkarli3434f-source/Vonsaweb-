@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /magaza-admin.html
+Disallow: /shop-api.php
+Disallow: /shop-core.php
+
+Sitemap: https://ejderstudio.com/sitemap.xml

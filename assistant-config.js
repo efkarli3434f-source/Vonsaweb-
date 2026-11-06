@@ -1,0 +1,2 @@
+/* Public routing key only. Provider and service-role secrets never enter the site. */
+window.EJDERVoiceConfig=Object.freeze({"url":"https://ggufodabantswxxvrbnv.supabase.co/functions/v1/ejder-voice","anonKey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdndWZvZGFiYW50c3d4eHZyYm52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MTk2NDMsImV4cCI6MjEwNDM5NTY0M30.qoz-fUa2mx5hxhEUetS4KpFGCWl2aejp7ODiKptNLQo"});

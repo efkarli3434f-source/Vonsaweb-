@@ -1,2 +1,4 @@
 # Packaged downloads of the site (kept locally, not versioned)
 *.zip
+# meSpeak source archive must ship with the site (GPL source offer)
+!assets/vendor/mespeak/source-2.0.7.zip

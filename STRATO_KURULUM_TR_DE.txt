@@ -1,0 +1,26 @@
+EJDER STUDIO — TEK KLASOR OLMADAN TAM SITE / VOLLSTAENDIGE WEBSITE OHNE EXTRA-ORDNER
+6 Kasim / November 2026
+
+TURKCE
+- Bu ZIP icindeki index.html DOSYASI ZIP'in en ust duzeyindedir. Icinde ejder-site veya EJDER_Studio diye ikinci bir klasor yoktur.
+- STRATO: Alan adinizin bagli oldugu web kok klasorunu (document root / Zielverzeichnis) kontrol edin.
+- Site dosyalarini o klasore cikarip index.html'nin dogrudan o klasorde bulunmasini saglayin.
+- ZIP'i STRATO ana klasorunde acip olusturdugu alt klasorun icinde birakmayin.
+- ZIP icindeki assets/, tasarim/, gestalten/ klasorlerini ve tum dosyalari bir arada yukleyin.
+- /ejder-site/EJDER_Studio/ daha once kullanilan yoldu; ancak STRATO panelinizde alan adinin gercek hedef klasorunu dogrulayin.
+- Bu paket 7.36 tam site yedegine dayalidir; 7.42a, 7.43, 7.44 asistan duzeltmeleri sirayla eklenmistir.
+- SON anahtarlik / kapusonlu V745 ve V746 yamalari KASITLI OLARAK UYGULANMAMISTIR.
+- 7.37-7.43 donemindeki baska yayin degisikliklerinin eksiksiz kaynaklari mevcut degildir; bire bir son canli hal oldugu iddia edilmez.
+- Sunucuya yeni kuruluyorsa magaza hesabiniz ve islem verileri farkli sunucu dosyalarinda tutuluyor olabilir; bu paket, silinen sunucu verilerini geri getirmez.
+- Test: /index.html ve /de.html ana sayfalari; urun sayfalari, 3D, sepet ve asistan. Mobilde asistan mikrofonu icin HTTPS ve izinler gerekir.
+- Mevcut sunucu dosyalarini silmeden once haricen yedek alin. Domain yonlendirmesiyle oynarken tek tek kontrol edin.
+
+DEUTSCH
+- index.html liegt DIREKT im ZIP-Hauptverzeichnis. Keine zusaetzliche Ordner-Ebene.
+- Im STRATO-Dateimanager das tatsaechliche Zielverzeichnis Ihrer Domain pruefen.
+- Den gesamten ZIP-INHALT in dieses Zielverzeichnis entpacken: index.html, assets/, tasarim/, gestalten/ usw.
+- Grundlage: vollstaendige Version 7.36; Sprachassistent-Aktualisierungen 7.42a/7.43/7.44 ergaenzt.
+- Die letzten Aenderungen V745/V746 fuer Schluesselanhaenger und Hoodie wurden bewusst nicht uebernommen.
+- Spaetere, nicht gesicherte Layout-Aenderungen lassen sich nicht als exakt wiederhergestellt bestaetigen.
+- Gesonderte Server-Daten (z. B. echte Kunden-/Admin-Datensaetze) sind kein Bestandteil dieses Codesicherungs-Pakets.
+- Nach dem Upload auf Deutsch, Tuerkisch, Mobilgeraet, 3D-Editor und Assistent testen.

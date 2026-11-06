@@ -1,0 +1,52 @@
+/* Shared typography; product geometry, canvas transforms and print coordinates stay intact. */
+#app :is(main,footer,section,article,aside,h1,h2,h3,h4,p,label,small,li,button,input:not([type=color]):not([type=range]):not([type=file]),textarea,select),
+#app :is(.eyebrow,.kicker,.disclaimer,.studio-hint,.privacy-state,.template-copy,.foot-end,.at-info,.at-state,.at-zoom),
+#utilityDialog :is(h2,h3,p,button,input,.chat-row,#utilityStatus,#assistantMode){text-align:center}
+#app :is(.at-info h1,.toolmenu button,.layer-item,.lettering-pickers label){text-align:center}
+#app :is(.palette,.at-swatches,.at-motifs,.contact-actions,.foot-end,.canvas-foot,.gallery-link){justify-content:center}
+#app .foot-links ul{padding-inline:0;list-style:none}
+#app .foot-brand img{margin-inline:auto}
+#app .card-body>div{flex:1;min-width:0}
+#app .pagehead p,#app .text-panel>p{margin-inline:auto}
+#app .account-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:24px auto 40px;max-width:1000px}
+#app .account-card{padding:26px;min-width:0}
+#app .account-card h2{font:500 29px Georgia,serif;color:#f2ce99}
+#app .account-card p{line-height:1.7;overflow-wrap:anywhere}
+#app .account-card .btn{margin:12px auto;max-width:100%;white-space:normal}
+#app .account-card [hidden]{display:none!important}
+#app .account-state{color:#e8c991;min-height:1.5em}
+#app .payment-methods{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:0;list-style:none}
+#app .payment-methods li{border:1px solid #aa805570;border-radius:12px;padding:10px 16px;background:#28101c}
+#app .account-login[aria-disabled=true]{opacity:.65;pointer-events:none}
+#voiceStage,#voiceLive,#voiceState,#voiceTip{text-align:center}
+#voiceLive{justify-content:center}
+@media(max-width:680px){#app .account-grid{grid-template-columns:1fr}#app .account-card{padding:20px}}
+/* The standalone image preparation page uses its own layout. */
+body.capture-centered :is(h1,h2,h3,p,small,label,input,select,button,.detail,.quality,.status,.kicker,.footnote){text-align:center}
+body.capture-centered .intro{margin-inline:auto}
+body.capture-centered :is(.panel-head,.action-row){justify-content:center}
+body.capture-centered .sliders output{float:none;display:block}
+
+.face-controls{display:flex;justify-content:center;flex-wrap:wrap;gap:.6rem;margin:1rem 0 .5rem}.face-controls [aria-pressed="true"]{background:#d8ac67;color:#201016;border-color:#f7d492}.face-note{font-size:.86rem;line-height:1.5;text-align:center}.face-controls button{white-space:normal}
+
+#app .at-info{align-items:center}#app .at-info>:is(h1,p,label,select,.at-kicker){width:100%;max-width:100%}#app .at-kicker{justify-content:center}
+
+/* Fit narrow browser viewports, including a visible scrollbar. */
+body{min-width:0}
+
+#app .stage3d-caption{align-items:center;text-align:center}#app :is(.at-choices,.at-tones){justify-content:center}#app .at-tones{margin-inline:auto}#app .at-tones legend{width:100%;text-align:center}#app .mini-help{margin-inline:auto;text-align:center}
+
+/* Centre the controls themselves, including fieldset legends and wrapped rows. */
+#app .at-choices{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:14px;min-width:0}
+#app :is(.at-tones,.at-motifs){display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px;width:100%;min-width:0;margin:0;text-align:center}
+#app :is(.at-tones,.at-motifs) legend{width:100%;margin:0 auto 7px;padding:0;text-align:center}
+#app .at-motifs button{margin:0;width:42px;height:42px;flex:none}
+#app .at-tones button{width:34px;height:34px;flex:none}
+#app .at-go{margin-top:18px;max-width:100%;white-space:normal}
+#app :is(.at-view,.at-info,.studio-side,.studio-preview,.studio-canvas-wrap){min-width:0}
+#app .at-edit-title{width:100%;max-width:100%;min-width:0;margin-inline:auto;white-space:normal;overflow-wrap:anywhere;text-wrap:balance;line-height:1.2;font-size:clamp(24px,5.5vw,38px)}
+#app :is(.canvas-head,.mini-row,.editor-actionbar,.saved-item .actions){justify-content:center;flex-wrap:wrap}
+#app .at-info select{text-align-last:center;padding-inline:28px}
+#app :is(.at-info h1,.at-info p,.at-sub,.face-note){overflow-wrap:anywhere}
+#app .at-sub{width:100%;text-align:center}
+@media(max-width:540px){#app .at-info{padding-inline:16px}#app .at-edit-title{padding-inline:8px}#app .at-tones{gap:2px}}

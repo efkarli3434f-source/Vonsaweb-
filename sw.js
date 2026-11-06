@@ -1,0 +1,331 @@
+'use strict';
+const PREFIX='ejder-studio:'+new URL(self.registration.scope).pathname+':';
+// The site assets match 7.42a. Only these four scripts need a new cache.
+const CACHE=PREFIX+'v7.44-restore-20261106';
+const VOICE_CACHE=PREFIX+'voice-7.44-restore-20261106';
+const VOICE_FILES=['assistant-natural-tr.js','assistant-local-speech.js','assistant-voice.js','support.js'];
+const FILES=[
+  "photo-tools.js",
+  "photo-layout.js",
+  "photo-fit-worker.js",
+  "assets/vendor/pico/pico.js",
+  "assets/vendor/pico/facefinder.bin",
+  "shop.js",
+  "shop.css",
+  "shop-data.js",
+  "assets/case-iphone16promax.webp",
+  "assets/case-iphone17promax.webp",
+  "assets/blanks/case-iphone16promax.webp",
+  "assets/blanks/case-iphone17promax.webp",
+  "assets/tints/case-iphone16promax.png",
+  "assets/tints/case-iphone17promax.png",
+  "ambient3d.js",
+  "app.js",
+  "route-paths.js",
+  "tasarim/iphone-17-pro-max/index.html",
+  "gestalten/iphone-17-pro-max/index.html",
+  "tasarim/iphone-16-pro-max/index.html",
+  "gestalten/iphone-16-pro-max/index.html",
+  "tasarim/iphone-17/index.html",
+  "gestalten/iphone-17/index.html",
+  "tasarim/samsung-galaxy-s26-ultra/index.html",
+  "gestalten/samsung-galaxy-s26-ultra/index.html",
+  "tasarim/xiaomi-17/index.html",
+  "gestalten/xiaomi-17/index.html",
+  "tasarim/xiaomi-17-ultra/index.html",
+  "gestalten/xiaomi-17-ultra/index.html",
+  "tasarim/huawei-pura-80-pro/index.html",
+  "gestalten/huawei-pura-80-pro/index.html",
+  "tasarim/motorola-edge-60-pro/index.html",
+  "gestalten/motorola-edge-60-pro/index.html",
+  "tasarim/iphone-16/index.html",
+  "gestalten/iphone-16/index.html",
+  "tasarim/samsung-galaxy-s24/index.html",
+  "gestalten/samsung-galaxy-s24/index.html",
+  "tasarim/xiaomi-redmi-note-13/index.html",
+  "gestalten/xiaomi-redmi-note-13/index.html",
+  "tasarim/google-pixel-9/index.html",
+  "gestalten/google-pixel-9/index.html",
+  "tasarim/kupa/index.html",
+  "gestalten/tasse/index.html",
+  "tasarim/tisort/index.html",
+  "gestalten/t-shirt/index.html",
+  "tasarim/anahtarlik/index.html",
+  "gestalten/schluesselanhaenger/index.html",
+  "tasarim/hoodie/index.html",
+  "gestalten/hoodie/index.html",
+  "tasarim/bez-canta/index.html",
+  "gestalten/stoffbeutel/index.html",
+  "tasarim/poster/index.html",
+  "gestalten/poster/index.html",
+  "tasarim/yastik/index.html",
+  "gestalten/kissen/index.html",
+  "tasarim/hediye-kutusu/index.html",
+  "gestalten/geschenkbox/index.html",
+  "assets/app-180.png",
+  "assets/app-192.png",
+  "assets/app-512.png",
+  "assets/atelier/giftbox.js",
+  "assets/blanks/case-edge60pro.webp",
+  "assets/blanks/case-iphone16.webp",
+  "assets/blanks/case-iphone17.webp",
+  "assets/blanks/case-pixel9.webp",
+  "assets/blanks/case-pura80pro.webp",
+  "assets/blanks/case-redmi13.webp",
+  "assets/blanks/case-s24.webp",
+  "assets/blanks/case-s26ultra.webp",
+  "assets/blanks/case-xiaomi17.webp",
+  "assets/blanks/case-xiaomi17ultra.webp",
+  "assets/blanks/case.webp",
+  "assets/blanks/cushion.webp",
+  "assets/blanks/hoodie.webp",
+  "assets/blanks/keychain.webp",
+  "assets/blanks/mug.webp",
+  "assets/blanks/poster.webp",
+  "assets/blanks/shirt.webp",
+  "assets/blanks/tote.webp",
+  "assets/brand-mask.css",
+  "assets/case-edge60pro.webp",
+  "assets/case-iphone16.webp",
+  "assets/case-iphone17.webp",
+  "assets/case-pixel9.webp",
+  "assets/case-pura80pro.webp",
+  "assets/case-redmi13.webp",
+  "assets/case-s24.webp",
+  "assets/case-s26ultra.webp",
+  "assets/case-xiaomi17.webp",
+  "assets/case-xiaomi17ultra.webp",
+  "assets/case.webp",
+  "assets/cushion.webp",
+  "assets/ejder_logo.png",
+  "assets/ejder_logo.webp",
+  "assets/ejder_logo_animated.webp",
+  "assets/giftbox.webp",
+  "assets/hero_showcase.webp",
+  "assets/hero-gift-showcase.webp",
+  "assets/banner-wide-v731.svg",
+  "home-showcase.css",
+  "tutorial-steps.css",
+  "assets/guide-steps-v730.png",
+  "assets/hoodie.webp",
+  "assets/keychain.webp",
+  "assets/mug.webp",
+  "assets/poster.webp",
+  "assets/previews/alpine.webp",
+  "assets/previews/anniversary.webp",
+  "assets/previews/astronaut.webp",
+  "assets/previews/bicycle.webp",
+  "assets/previews/bird.webp",
+  "assets/previews/butterfly.webp",
+  "assets/previews/cat.webp",
+  "assets/previews/compass.webp",
+  "assets/previews/coupe.webp",
+  "assets/previews/crescent.webp",
+  "assets/previews/dance.webp",
+  "assets/previews/dragon.webp",
+  "assets/previews/floral.webp",
+  "assets/previews/football.webp",
+  "assets/previews/foreheads.webp",
+  "assets/previews/fox.webp",
+  "assets/previews/headphones.webp",
+  "assets/previews/heart.webp",
+  "assets/previews/horse.webp",
+  "assets/previews/hummingbird.webp",
+  "assets/previews/koi.webp",
+  "assets/previews/lavender.webp",
+  "assets/previews/lifetime.webp",
+  "assets/previews/minimal.webp",
+  "assets/previews/monogram.webp",
+  "assets/previews/nature.webp",
+  "assets/previews/night.webp",
+  "assets/previews/panda.webp",
+  "assets/previews/pet.webp",
+  "assets/previews/phoenix.webp",
+  "assets/previews/racer.webp",
+  "assets/previews/rose.webp",
+  "assets/previews/sapphire.webp",
+  "assets/previews/saturn.webp",
+  "assets/previews/shore.webp",
+  "assets/previews/stag.webp",
+  "assets/previews/step-photo.webp",
+  "assets/previews/step-png.webp",
+  "assets/previews/step-preview.webp",
+  "assets/previews/step-text.webp",
+  "assets/previews/sunflower.webp",
+  "assets/previews/tiger.webp",
+  "assets/previews/tulip.webp",
+  "assets/previews/umbrella.webp",
+  "assets/previews/wave.webp",
+  "assets/previews/wedding.webp",
+  "assets/shirt.webp",
+  "assets/studio-fonts.css",
+  "assets/themes/alpine.webp",
+  "assets/themes/anniversary.webp",
+  "assets/themes/astronaut.webp",
+  "assets/themes/bicycle.webp",
+  "assets/themes/bird.webp",
+  "assets/themes/butterfly.webp",
+  "assets/themes/cat.webp",
+  "assets/themes/compass.webp",
+  "assets/themes/coupe.webp",
+  "assets/themes/crescent.webp",
+  "assets/themes/dance.webp",
+  "assets/themes/dragon.webp",
+  "assets/themes/floral.webp",
+  "assets/themes/football.webp",
+  "assets/themes/foreheads.webp",
+  "assets/themes/fox.webp",
+  "assets/themes/headphones.webp",
+  "assets/themes/heart.webp",
+  "assets/themes/horse.webp",
+  "assets/themes/hummingbird.webp",
+  "assets/themes/koi.webp",
+  "assets/themes/lavender.webp",
+  "assets/themes/lifetime.webp",
+  "assets/themes/minimal.webp",
+  "assets/themes/monogram.webp",
+  "assets/themes/nature.webp",
+  "assets/themes/night.webp",
+  "assets/themes/panda.webp",
+  "assets/themes/pet.webp",
+  "assets/themes/phoenix.webp",
+  "assets/themes/racer.webp",
+  "assets/themes/rose.webp",
+  "assets/themes/sapphire.webp",
+  "assets/themes/saturn.webp",
+  "assets/themes/shore.webp",
+  "assets/themes/stag.webp",
+  "assets/themes/sunflower.webp",
+  "assets/themes/tiger.webp",
+  "assets/themes/tulip.webp",
+  "assets/themes/umbrella.webp",
+  "assets/themes/wave.webp",
+  "assets/themes/wedding.webp",
+  "assets/tints/case-edge60pro.png",
+  "assets/tints/case-iphone16.png",
+  "assets/tints/case-iphone17.png",
+  "assets/tints/case-pixel9.png",
+  "assets/tints/case-pura80pro.png",
+  "assets/tints/case-redmi13.png",
+  "assets/tints/case-s24.png",
+  "assets/tints/case-s26ultra.png",
+  "assets/tints/case-xiaomi17.png",
+  "assets/tints/case-xiaomi17ultra.png",
+  "assets/tints/cushion.png",
+  "assets/tints/giftbox.png",
+  "assets/tints/hoodie.png",
+  "assets/tints/keychain.png",
+  "assets/tints/mug.png",
+  "assets/tints/poster.png",
+  "assets/tints/shirt.png",
+  "assets/tints/tote.png",
+  "assets/tote.webp",
+  "assistant-knowledge.js",
+  "assistant-voice.js",
+  "assistant-local-speech.js",
+  "assistant-natural-tr.js",
+  "assets/vendor/mespeak/mespeak.js",
+  "assets/vendor/mespeak/mespeak-core.js",
+  "assets/vendor/mespeak/voices/tr.json",
+  "assets/vendor/mespeak/voices/de.json",
+  "assistant-config.js",
+  "assistant-conversation.js",
+  "assistant-audio-worklet.js",
+  "assistant.css",
+  "atelier-render.js",
+  "atelier.css",
+  "atelier.js",
+  "case-models.js",
+  "index.html",
+  "de.html",
+  "seo.js",
+  "account.js",
+  "exports.js",
+  "centered.css",
+  "manifest.webmanifest",
+  "netlestir.html",
+  "netlestir.css",
+  "netlestir.js",
+  "showcase3d.js",
+  "studio-layout.css",
+  "styles.css",
+  "support.js"
+];
+const MODELS=["assets/atelier/case-iphone16promax.js","assets/atelier/case-iphone17promax.js","assets/atelier/case-edge60pro.js", "assets/atelier/case-iphone16.js", "assets/atelier/case-iphone17.js", "assets/atelier/case-pixel9.js", "assets/atelier/case-pura80pro.js", "assets/atelier/case-redmi13.js", "assets/atelier/case-s24.js", "assets/atelier/case-s26ultra.js", "assets/atelier/case-xiaomi17.js", "assets/atelier/case-xiaomi17ultra.js", "assets/atelier/cushion.js", "assets/atelier/giftbox.js", "assets/atelier/hoodie.js", "assets/atelier/keychain.js", "assets/atelier/mug.js", "assets/atelier/poster.js", "assets/atelier/shirt.js", "assets/atelier/tote.js"];
+const STUDIO_ENTRIES=["tasarim/iphone-17-pro-max/index.html", "gestalten/iphone-17-pro-max/index.html", "tasarim/iphone-16-pro-max/index.html", "gestalten/iphone-16-pro-max/index.html", "tasarim/iphone-17/index.html", "gestalten/iphone-17/index.html", "tasarim/samsung-galaxy-s26-ultra/index.html", "gestalten/samsung-galaxy-s26-ultra/index.html", "tasarim/xiaomi-17/index.html", "gestalten/xiaomi-17/index.html", "tasarim/xiaomi-17-ultra/index.html", "gestalten/xiaomi-17-ultra/index.html", "tasarim/huawei-pura-80-pro/index.html", "gestalten/huawei-pura-80-pro/index.html", "tasarim/motorola-edge-60-pro/index.html", "gestalten/motorola-edge-60-pro/index.html", "tasarim/iphone-16/index.html", "gestalten/iphone-16/index.html", "tasarim/samsung-galaxy-s24/index.html", "gestalten/samsung-galaxy-s24/index.html", "tasarim/xiaomi-redmi-note-13/index.html", "gestalten/xiaomi-redmi-note-13/index.html", "tasarim/google-pixel-9/index.html", "gestalten/google-pixel-9/index.html", "tasarim/kupa/index.html", "gestalten/tasse/index.html", "tasarim/tisort/index.html", "gestalten/t-shirt/index.html", "tasarim/anahtarlik/index.html", "gestalten/schluesselanhaenger/index.html", "tasarim/hoodie/index.html", "gestalten/hoodie/index.html", "tasarim/bez-canta/index.html", "gestalten/stoffbeutel/index.html", "tasarim/poster/index.html", "gestalten/poster/index.html", "tasarim/yastik/index.html", "gestalten/kissen/index.html", "tasarim/hediye-kutusu/index.html", "gestalten/geschenkbox/index.html"];
+const toURL=file=>new URL(file,self.registration.scope).href;
+const allowed=new Set(FILES.map(toURL));
+const models=new Set(MODELS.map(toURL));
+const voiceScripts=new Set(VOICE_FILES.map(toURL));
+self.addEventListener('install',event=>{
+  event.waitUntil((async()=>{
+    const cache=await caches.open(CACHE);
+    const voiceCache=await caches.open(VOICE_CACHE);
+    await Promise.all(VOICE_FILES.map(async file=>{
+      const url=toURL(file);
+      const response=await fetch(url+(file==='assistant-voice.js'?'?v=7.44':'?v=7.43'),{cache:'reload'});
+      if(!response.ok)throw new Error('Voice script unavailable: '+file);
+      await voiceCache.put(url,response);
+    }));
+    if(!await cache.match(toURL('index.html'))){
+      await cache.addAll(FILES.filter(file=>!VOICE_FILES.includes(file)).map(file=>new Request(toURL(file),{cache:'reload'})));
+    }
+    await self.skipWaiting();
+  })());
+});
+self.addEventListener('activate',event=>{
+  event.waitUntil((async()=>{
+    await self.clients.claim();
+    const keys=await caches.keys();
+    await Promise.all(keys.filter(key=>key.startsWith(PREFIX)&&key!==CACHE&&key!==VOICE_CACHE).map(key=>caches.delete(key)));
+  })());
+});
+async function openEntry(req,entry){
+  const cached=await caches.match(toURL(entry),{cacheName:CACHE});
+  if(!cached)return fetch(req,{cache:'no-cache'});
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),2800);
+  try{
+    const online=await fetch(req,{signal:controller.signal,cache:'no-cache'});
+    return online.status>=500||online.status===408?cached:online;
+  }catch{
+    return cached;
+  }finally{
+    clearTimeout(timer);
+  }
+}
+self.addEventListener('fetch',event=>{
+  const req=event.request;
+  if(req.method!=='GET')return;
+  const url=new URL(req.url);
+  if(url.origin!==self.location.origin)return;
+  const query=url.search;
+  url.search='';
+  url.hash='';
+  const studioEntry=STUDIO_ENTRIES.find(file=>url.href===toURL(file)||url.href===toURL(file.replace(/index\.html$/,'')));
+  if(req.mode==='navigate'&&studioEntry){event.respondWith(openEntry(req,studioEntry));return;}
+  const isEntry=req.mode==='navigate'&&(url.href===self.registration.scope||url.href===toURL('index.html')||url.href===toURL('de.html')||url.href===toURL('netlestir.html'));
+  if(isEntry){
+    if(!query||/^\?v=\d+(?:\.\d+)*$/.test(query))event.respondWith(openEntry(req,url.href===toURL('netlestir.html')?'netlestir.html':url.href===toURL('de.html')?'de.html':'index.html'));
+    return;
+  }
+  // The Turkish voice downloads only when used. Storage limits must never interrupt playback.
+  if(!query&&url.href.startsWith(toURL('assets/vendor/okur/'))){
+    event.respondWith((async()=>{
+      const cache=await caches.open(CACHE),hit=await cache.match(req);if(hit)return hit;
+      const response=await fetch(req);
+      if(response.ok)try{await cache.put(req,response.clone());}catch{}
+      return response;
+    })());return;
+  }
+  if(models.has(url.href)&&!query){
+    event.respondWith((async()=>{const c=await caches.open(CACHE),hit=await c.match(url.href);if(hit)return hit;
+      const response=await fetch(req);if(response.ok)await c.put(url.href,response.clone());return response;})());return;
+  }
+  if(voiceScripts.has(url.href)&&(!query||/^\?v=\d+(?:\.\d+)*$/.test(query))){
+    event.respondWith(caches.match(url.href,{cacheName:VOICE_CACHE}).then(saved=>saved||fetch(req)));
+    return;
+  }
+  if(!allowed.has(url.href)||(query&&!['?v=5','?v=5.1','?v=6','?v=6.1','?v=7','?v=7.1','?v=7.5','?v=7.6','?v=7.7','?v=7.8','?v=7.8.1','?v=7.8.2','?v=7.9','?v=7.10','?v=7.11','?v=7.12','?v=7.13.1','?v=7.14','?v=7.14.1','?v=7.15','?v=7.18','?v=7.19','?v=7.20','?v=7.21','?v=7.21.1','?v=7.23','?v=7.24','?v=7.25','?v=7.27','?v=7.28','?v=7.29','?v=7.30','?v=7.31','?v=7.32','?v=7.33','?v=7.36','?v=7.37','?v=7.38','?v=7.39','?v=7.44'].includes(query)))return;
+  event.respondWith(caches.match(url.href,{cacheName:CACHE}).then(saved=>saved||fetch(req)));
+});
