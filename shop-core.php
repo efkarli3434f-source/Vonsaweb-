@@ -31,13 +31,29 @@ final class EjderShop {
         if (!is_dir($dir) && !mkdir($dir,0700,true) && !is_dir($dir)) throw new ShopError('storage_unavailable',503);
         if (!is_file($dir.'/.htaccess') && file_put_contents($dir.'/.htaccess',"Require all denied\n")===false) throw new ShopError('storage_unavailable',503);
     }
+    // The first 12-model case list becomes the current catalogue once, unless the owner edited it.
+    private const LEGACY_CASE_MODELS=['Google Pixel 9','Huawei Pura 80 Pro','Motorola Edge 60 Pro','Samsung Galaxy S24','Samsung Galaxy S26 Ultra','Xiaomi 17','Xiaomi 17 Ultra','Xiaomi Redmi Note 13 5G','iPhone 16','iPhone 16 Pro Max','iPhone 17','iPhone 17 Pro Max'];
+    private static function upgradeCaseModels(array &$db): void {
+        if (!isset($db['products']) || !is_array($db['products'])) return;
+        $current=null;
+        foreach ($db['products'] as $key=>$p) {
+            if (!is_array($p) || ($p['type']??'')!=='case' || !is_array($p['models']??null)) continue;
+            $models=$p['models'];sort($models,SORT_STRING);
+            if ($models!==self::LEGACY_CASE_MODELS) continue;
+            if ($current===null) {
+                $seed=json_decode((string)@file_get_contents(__DIR__.'/shop-seed.json'),true);
+                $current=is_array($seed)&&is_array($seed['case']['models']??null)?array_values(array_filter($seed['case']['models'],'is_string')):[];
+            }
+            if (count($current)>count($models)) $db['products'][$key]['models']=$current;
+        }
+    }
     public function transact(callable $fn){
         $lock=fopen($this->dir.'/lock.php','c+b');if(!$lock||!flock($lock,LOCK_EX)) throw new ShopError('storage_unavailable',503);
         try {
             $path=$this->dir.'/store.php';$raw=is_file($path)?file_get_contents($path):false;
             if($raw!==false){if(strncmp($raw,self::PREFIX,strlen(self::PREFIX))!==0)throw new ShopError('storage_invalid',503);$db=json_decode(substr($raw,strlen(self::PREFIX)),true,32,JSON_THROW_ON_ERROR);}
             else $db=['version'=>1,'secret'=>bin2hex(random_bytes(32)),'admin'=>null,'products'=>json_decode(file_get_contents(__DIR__.'/shop-seed.json'),true,16,JSON_THROW_ON_ERROR),'requests'=>[],'rate'=>[], 'stats'=>[],'settings'=>['requestsOpen'=>false,'email'=>'','name'=>'','address'=>'','deliveryTr'=>'','deliveryDe'=>'']];
-            $before=json_encode($db);$result=$fn($db);
+            $before=json_encode($db);self::upgradeCaseModels($db);$result=$fn($db);
             if($before!==json_encode($db)||$raw===false){
                 $data=self::PREFIX.json_encode($db,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR);
                 if(strlen($data)>20000000)throw new ShopError('storage_full',503);

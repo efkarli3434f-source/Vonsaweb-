@@ -87,7 +87,7 @@ const FONTS={
 };
 let extraFonts=null;
 function loadExtraFonts(){
-  if(!extraFonts)extraFonts=new Promise(resolve=>{const link=document.createElement('link');link.rel='stylesheet';link.href='assets/studio-fonts-extra.css?v=7.50';link.onload=()=>resolve(true);link.onerror=()=>{extraFonts=null;resolve(false);};document.head.append(link);});
+  if(!extraFonts)extraFonts=new Promise(resolve=>{const link=document.createElement('link');link.rel='stylesheet';link.href='assets/studio-fonts-extra.css?v=7.52';link.onload=()=>resolve(true);link.onerror=()=>{extraFonts=null;resolve(false);};document.head.append(link);});
   return extraFonts;
 }
 const FINISHES={plain:['Düz renk','Einfarbig'],outline:['Kontur','Kontur'],foil:['Altın varak','Goldfolie']};

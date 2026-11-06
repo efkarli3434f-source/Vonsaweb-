@@ -1,5 +1,5 @@
 EJDER STUDIO — STRATO KURULUMU / STRATO-EINRICHTUNG
-Sürüm / Version 7.50 · 6 Kasım / November 2026
+Sürüm / Version 7.52 · 6 Kasım / November 2026
 
 TÜRKÇE
 ======

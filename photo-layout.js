@@ -13,7 +13,7 @@ function locate(image){
   const transparent=alpha>pixels.length*.02;
   return new Promise(resolve=>{
     try{
-      if(!worker){worker=new Worker(new URL('photo-fit-worker.js?v=7.50',document.baseURI));worker.onmessage=({data})=>{const job=jobs.get(data.id);if(!job)return;clearTimeout(job.timer);jobs.delete(data.id);job.resolve(data);};worker.onerror=stop;}
+      if(!worker){worker=new Worker(new URL('photo-fit-worker.js?v=7.52',document.baseURI));worker.onmessage=({data})=>{const job=jobs.get(data.id);if(!job)return;clearTimeout(job.timer);jobs.delete(data.id);job.resolve(data);};worker.onerror=stop;}
       const id=++serial,timer=setTimeout(stop,12000);jobs.set(id,{resolve:result=>resolve(transparent?{...result,status:'transparent'}:result),timer});worker.postMessage({id,width,height,pixels},[pixels.buffer]);
     }catch{stop();resolve({faces:[],status:'unavailable'});}
   });

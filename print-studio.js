@@ -16,14 +16,14 @@ const jobs=new Map(),timers=new WeakMap(),running=new Set();
 function stopWorker(){if(worker)worker.terminate();worker=null;for(const j of jobs.values())j(null);jobs.clear();}
 function loadCore(){
   if(window.EJDERSharpenCore)return Promise.resolve();
-  if(!coreReady)coreReady=new Promise((ok,no)=>{const s=document.createElement('script');s.src='photo-sharpen-core.js?v=7.50';s.onload=ok;s.onerror=no;document.head.append(s);});
+  if(!coreReady)coreReady=new Promise((ok,no)=>{const s=document.createElement('script');s.src='photo-sharpen-core.js?v=7.52';s.onload=ok;s.onerror=no;document.head.append(s);});
   return coreReady;
 }
 async function runSharpen(pixels,width,height,params){
   if(!workerFailed&&typeof Worker==='function'&&location.protocol!=='file:'){
     try{
       if(!worker){
-        worker=new Worker(new URL('photo-sharpen-worker.js?v=7.50',document.baseURI));
+        worker=new Worker(new URL('photo-sharpen-worker.js?v=7.52',document.baseURI));
         worker.onmessage=({data})=>{const done=jobs.get(data.id);if(done){jobs.delete(data.id);done(data.ok?new Uint8ClampedArray(data.buffer):null);}};
         worker.onerror=()=>{workerFailed=true;stopWorker();};
       }
