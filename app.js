@@ -244,7 +244,7 @@ let imageTicket = 0, selectedBounds = [], pendingTemplate = null;
 let editorRoute = null;
 
 function words(a, b) { return language === 'de' ? b : a; }
-function defaultFillMode(id){return id==='keychain'?'smart':['shirt','hoodie','tote'].includes(id)?'contain':'cover';}
+function defaultFillMode(id){return id==='keychain'?'smart':'cover';}
 function makeEditor(id) {
   return {
     product: PRODUCTS.some(p => p.id === id) ? id : 'mug',
@@ -321,7 +321,7 @@ function disposeTemporaryPhotos(updateUI=true) {
     if(photo.url) URL.revokeObjectURL(photo.url);
     photo.img.onload=null;
     photo.img.onerror=null;
-    photo.img.removeAttribute('src');if(photo.cutoutURL)URL.revokeObjectURL(photo.cutoutURL);photo.cutout?.removeAttribute('src');
+    photo.img.removeAttribute('src');if(photo.cutoutURL)URL.revokeObjectURL(photo.cutoutURL);photo.cutout?.removeAttribute('src');window.EJDERPrint?.disposeSharp(photo);
   }
   if(cachedImages.size){
     for(const canvas of [studioCanvas,document.getElementById('studioPreview')]){
@@ -460,10 +460,13 @@ function studioPage(){
           <label for="printBackground">${words('Baskı alanının fonu','Hintergrund der Druckfläche')}</label><select id="printBackground">${editor.product==='keychain'?`<option value="photo" ${editor.printBackground==='photo'?'selected':''}>${words('Fotoğrafla yumuşak tamamla','Mit Foto weich ergänzen')}</option>`:''}<option value="transparent" ${editor.printBackground==='transparent'?'selected':''}>${words('Şeffaf · Ürün rengi görünsün','Transparent · Produktfarbe sichtbar')}</option><option value="color" ${editor.printBackground==='color'?'selected':''}>${words('Kendi rengimi seçeyim','Eigene Farbe wählen')}</option></select>
           ${editor.printBackground==='color'?`<label for="printBackgroundColor">${words('Fon rengi','Hintergrundfarbe')}</label><input id="printBackgroundColor" type="color" value="${editor.printBackgroundColor||'#ffffff'}">`:''}
           ${sel?.type==='image'?`<label for="photoBackground">${words('Seçili fotoğrafın arka planı','Hintergrund des gewählten Fotos')}</label><select id="photoBackground"><option value="keep" ${sel.background!=='remove'?'selected':''}>${words('Orijinal arka planı koru','Originalhintergrund behalten')}</option><option value="remove" ${sel.background==='remove'?'selected':''}>${words('Tek renk arka planı kaldır','Einfarbigen Hintergrund entfernen')}</option></select><p class="mini-help">${words('Kaldırma yalnız tek renk kenar fonlarında çalışır. Karmaşık fotoğraflar için önceden hazırlanmış şeffaf PNG kullan. Orijinale her zaman dönebilirsin.','Entfernen funktioniert bei einfarbigen Rändern. Für komplexe Fotos bitte ein freigestelltes PNG verwenden. Das Original bleibt wiederherstellbar.')}</p>
-          <label for="photoZoom">${words('Fotoğrafı yakınlaştır','Foto vergrößern')} <output id="photoZoomOutput">${Math.round((sel.zoom||1)*100)}%</output></label><input id="photoZoom" type="range" min=".25" max="4" step=".01" value="${sel.zoom||1}">
+          <label for="photoZoom">${words('Fotoğrafı yakınlaştır','Foto vergrößern')} <output id="photoZoomOutput">${Math.round((sel.zoom||1)*100)}%</output></label><input id="photoZoom" type="range" min="${editor.fillMode==='contain'?'.25':'1'}" max="4" step=".01" value="${Math.max(editor.fillMode==='contain'?.25:1,sel.zoom||1)}">
           <label for="photoX">${words('Fotoğrafın yatay konumu','Foto horizontal verschieben')}</label><input id="photoX" type="range" min="-1" max="1" step=".01" value="${sel.panX||0}">
           <label for="photoY">${words('Fotoğrafın dikey konumu','Foto vertikal verschieben')}</label><input id="photoY" type="range" min="-1" max="1" step=".01" value="${sel.panY||0}">
-          <button type="button" class="btn secondary tiny" data-action="fit-photo">${words('Herkesi sığdır ve ortala','Alle einpassen und zentrieren')}</button><p class="mini-help">${words('Elle büyütme ve kaydırma kenarları kesebilir. Yukarıdaki düğme güvenli yerleşime döndürür.','Manuelles Vergrößern und Verschieben kann Ränder abschneiden. Die Taste stellt die sichere Platzierung wieder her.')}</p>`:''}
+          <label for="photoAngle">${words('Fotoğrafı döndür','Foto drehen')} <output id="photoAngleOutput">${sel.angle||0}°</output></label><input id="photoAngle" type="range" min="-45" max="45" step="1" value="${sel.angle||0}">
+          <label for="photoSharpen">${words('Netlik','Schärfe')} <output id="photoSharpenOutput">${window.EJDERPrint?.sharpLabel(sel,cachedImages.get(sel.key))||''}</output></label><input id="photoSharpen" type="range" min="0" max="100" step="1" value="${window.EJDERPrint?.wanted(sel,cachedImages.get(sel.key)||{})??30}">
+          <button type="button" class="btn secondary tiny" data-action="sharpen-auto">${words('Netliği otomatik yap','Schärfe automatisch')}</button><p class="mini-help">${words('Netlik her fotoğrafın çözünürlüğüne ve bulanıklığına göre otomatik ayarlanır; ön izleme, 3D ve baskı dosyası aynı netliği kullanır. Kaydırıcıyla elle değiştirebilirsin (0 = kapalı).','Die Schärfe wird für jedes Foto nach Auflösung und Unschärfe automatisch eingestellt; Vorschau, 3D und Druckdatei nutzen dieselbe Schärfe. Mit dem Regler manuell änderbar (0 = aus).')}</p>
+          <button type="button" class="btn secondary tiny" data-action="fit-photo">${words('Ortala ve tam kapla','Zentrieren & randlos füllen')}</button><p class="mini-help">${words('Tam kaplamada fotoğrafı büyütebilir, sürükleyebilir ve döndürebilirsin; kenarı hiçbir zaman baskı alanının içine girmez, üründe boşluk kalmaz. Düğme ilk yerleşime döndürür.','Beim randlosen Füllen kannst du das Foto vergrößern, verschieben und drehen; seine Kante rückt nie in die Druckfläche, es bleibt keine Lücke. Die Taste stellt die erste Platzierung wieder her.')}</p>`:''}
           <p class="mini-help">${words('Baskı dosyası ürünün gerçek kalıbıyla atölyede hazırlanır. Bu görünüm fiziksel üretim onayı değildir.','Druckdateien werden in der Werkstatt mit der echten Produktschablone erstellt. Diese Ansicht ist keine Produktionsfreigabe.')}</p>
           <div class="privacy-state" id="privacyState" aria-live="polite"></div>
           <button type="button" class="btn secondary tiny" data-action="delete-photos">${words('Geçici fotoğrafları sil','Temporäre Fotos löschen')}</button>
@@ -501,7 +504,7 @@ function studioPage(){
         <div class="flip3d-tools"><button type="button" class="btn secondary tiny" data-flip="toggle" aria-pressed="${flipBack()}">${flipBack()?words('↻ Tasarımını gör','↻ Dein Design ansehen'):words('↻ Katalog örneğini gör','↻ Katalogbeispiel ansehen')}</button><small>${words('Kartı sürükleyerek 3D çevir','Karte ziehen, um sie in 3D zu drehen')}</small></div>
         <div class="controlgroup"><h3>${words('Seçilen ürün','Gewähltes Produkt')}</h3><canvas id="chosenSurface" width="450" height="325" class="product-preview-image" aria-label="${escapeHTML(name(choice))}"></canvas><p>${escapeHTML(name(choice))}</p></div>
         <div class="controlgroup"><h3>${words('Fotoğraf gizliliği','Foto-Datenschutz')}</h3><p>${words('Fotoğraflar hiçbir sunucuya veya kalıcı depoya yüklenmez. Tasarımı kaydedince yalnızca yazı/renk bilgileri kalır. PNG indirince fotoğraflar tarayıcı belleğinden temizlenir.','Fotos werden nicht an Server oder dauerhafte Speicher übertragen. Beim Speichern bleiben nur Text und Farben. Nach dem PNG-Download werden Fotos aus dem Browser-Speicher entfernt.')}</p></div>
-        <div class="studio-panel-actions"><button class="btn secondary tiny" type="button" data-action="save">▣ ${tr('save')}</button><button class="btn tiny" type="button" data-action="download">↓ ${words('Ürün görsellerini indir','Produktbilder herunterladen')}</button><button class="btn secondary tiny" type="button" data-action="workshop-pack">${words('Atölye paketini indir','Werkstattpaket herunterladen')}</button><button class="btn secondary tiny artwork-export" type="button" data-action="download-art">↓ ${words('Tasarım dosyalarını indir','Motivdateien herunterladen')}</button></div>
+        <div class="studio-panel-actions"><button class="btn tiny print-file" type="button" data-action="print-file">⎙ ${words('Baskıya hazırla (PDF / PNG)','Druck vorbereiten (PDF / PNG)')}</button><button class="btn secondary tiny" type="button" data-action="save">▣ ${tr('save')}</button><button class="btn tiny" type="button" data-action="download">↓ ${words('Ürün görsellerini indir','Produktbilder herunterladen')}</button><button class="btn secondary tiny" type="button" data-action="workshop-pack">${words('Atölye paketini indir','Werkstattpaket herunterladen')}</button><button class="btn secondary tiny artwork-export" type="button" data-action="download-art">↓ ${words('Tasarım dosyalarını indir','Motivdateien herunterladen')}</button></div>
         <button class="btn danger studio-finish" type="button" data-action="finish">✓ ${words('İşlemi bitir ve fotoğrafları sil','Fertig & Fotos löschen')}</button>
       </aside>
     </div>
@@ -706,13 +709,55 @@ function drawSmartPhoto(ctx,area,art,design,showSelection,caption){
  // Selecting a smart photo must not draw a misleading rectangular frame.
  if(showSelection)selectedBounds.push({id:layer.id,x:area.x+area.w/2,y:area.y+area.h/2,w:area.w*.94,h:area.h*.94,round:true});
 }
-function photoImage(layer){const p=cachedImages.get(layer.key);return layer.background==='remove'&&p?.cutout?p.cutout:p?.img;}
+function photoImage(layer){const p=cachedImages.get(layer.key);if(!p)return undefined;if(layer.background==='remove'&&p.cutout)return p.cutout;window.EJDERPrint?.ensureSharp(layer,p);return layer.sharpen!==0&&p.sharp?p.sharp:p.img;}
+// Edge-to-edge placement: the (rotated) image always covers the frame. Zoom and pan move
+// the photo inside the print area but never pull an edge inside it.
+function coverFit(frame,iw,ih,zoom,angle,start,panX=0,panY=0){
+  const c=Math.abs(Math.cos(angle)),s=Math.abs(Math.sin(angle));
+  const scale=Math.max((frame.w*c+frame.h*s)/iw,(frame.w*s+frame.h*c)/ih,Math.max(frame.w/iw,frame.h/ih)*Math.max(1,zoom||1));
+  const w=iw*scale,h=ih*scale,fcx=frame.x+frame.w/2,fcy=frame.y+frame.h/2;
+  let cx,cy;
+  if(start.anchorX!==undefined){cx=fcx+(.5-start.anchorX)*w;cy=fcy+(.5-start.anchorY)*h;}
+  else{cx=frame.x-(w-frame.w)*start.focusX+w/2;cy=frame.y-(h-frame.h)*start.focusY+h/2;}
+  cx+=panX;cy+=panY;
+  const cos=Math.cos(angle),sin=Math.sin(angle),corners=[[frame.x,frame.y],[frame.x+frame.w,frame.y],[frame.x,frame.y+frame.h],[frame.x+frame.w,frame.y+frame.h]];
+  const covers=(x,y)=>corners.every(([px,py])=>{const dx=px-x,dy=py-y;return Math.abs(dx*cos+dy*sin)<=w/2+.01&&Math.abs(-dx*sin+dy*cos)<=h/2+.01;});
+  if(!covers(cx,cy)){
+    const ox=cx-fcx,oy=cy-fcy;let lo=0,hi=1;
+    for(let i=0;i<22;i++){const m=(lo+hi)/2;if(covers(fcx+ox*m,fcy+oy*m))lo=m;else hi=m;}
+    cx=fcx+ox*lo;cy=fcy+oy*lo;
+  }
+  return {cx,cy,w,h,scale};
+}
+function collageCells(frame,count){
+  const {x,y,w,h}=frame,wide=w>=h;
+  if(count===2)return wide?[{x,y,w:w/2,h},{x:x+w/2,y,w:w/2,h}]:[{x,y,w,h:h/2},{x,y:y+h/2,w,h:h/2}];
+  if(count===3)return wide?[{x,y,w:w*.56,h},{x:x+w*.56,y,w:w*.44,h:h/2},{x:x+w*.56,y:y+h/2,w:w*.44,h:h/2}]
+    :[{x,y,w,h:h*.56},{x,y:y+h*.56,w:w/2,h:h*.44},{x:x+w/2,y:y+h*.56,w:w/2,h:h*.44}];
+  const cols=2,rows=Math.ceil(count/cols),cells=[];
+  for(let i=0;i<count;i++){const r=Math.floor(i/cols),inRow=r===rows-1&&count%cols?count%cols:cols,cw=w/inRow;cells.push({x:x+(i%cols)*cw,y:y+r*h/rows,w:cw,h:h/rows});}
+  return cells;
+}
+// Several photos share the print surface edge to edge. Detected faces are kept near each cell centre.
+function drawCollage(ctx,arts,frame,area,design,showSelection){
+  const cells=collageCells(frame,arts.length);
+  arts.forEach((art,i)=>{
+    const cell=cells[i],{image,layer}=art,iw=image.naturalWidth,ih=image.naturalHeight;
+    const focus=art.kind==='motif'?mediaCache.get('themes/'+design.template+'.webp')?.focus:cachedImages.get(layer.key)?.focus;
+    const faces=focus?.faces||[];
+    const start=faces.length?{anchorX:(Math.min(...faces.map(f=>f.x))+Math.max(...faces.map(f=>f.x+f.w)))/2,anchorY:(Math.min(...faces.map(f=>f.y))+Math.max(...faces.map(f=>f.y+f.h)))/2}:{focusX:.5,focusY:.5};
+    const angle=(layer.angle||0)*Math.PI/180,fit=coverFit(cell,iw,ih,layer.zoom,angle,start,(layer.panX||0)*area.w/2,(layer.panY||0)*area.h/2);
+    ctx.save();ctx.beginPath();ctx.rect(cell.x-.4,cell.y-.4,cell.w+.8,cell.h+.8);ctx.clip();
+    ctx.translate(fit.cx,fit.cy);ctx.rotate(angle);ctx.drawImage(image,-fit.w/2,-fit.h/2,fit.w,fit.h);ctx.restore();
+    if(showSelection&&art.kind==='photo')selectedBounds.push({id:layer.id,x:cell.x+cell.w/2,y:cell.y+cell.h/2,w:cell.w,h:cell.h});
+  });
+}
 function useCover(image,design){
-  return design.fillMode==='cover'&&(design.product.startsWith('case')||visibleInk(image).opaque||
+  return (design.fillMode==='cover'||design.fillMode==='smart'&&design.product==='keychain')&&(design.product.startsWith('case')||visibleInk(image).opaque||
     ['poster','cushion'].includes(design.product));
 }
 // Keep the occupied part at full size when possible. Known faces constrain the crop together.
-function placeCoverSubject(image,ink,faces,frame,frontWidth,focusX,focusY){
+function placeCoverSubject(image,ink,faces,frame,frontWidth,focusX,focusY,safeTop=frame.y){
   const w=image.naturalWidth,h=image.naturalHeight;
   const shape=ink.shape, bounds=ink.bounds;
   const b=shape?{x:shape.left,y:shape.top,right:shape.right,bottom:shape.bottom}:bounds;
@@ -737,13 +782,20 @@ function placeCoverSubject(image,ink,faces,frame,frontWidth,focusX,focusY){
   }else if(!shape&&ink.detail){
     safe={...ink.detail,y:0,bottom:h*.75};
   }
-  if(safe)scale=Math.min(scale,frontWidth/Math.max(1,safe.right-safe.x),frame.h/Math.max(1,safe.bottom-safe.y));
+  const safeHeight=Math.max(1,frame.y+frame.h-Math.max(frame.y,safeTop));
+  if(safe)scale=Math.min(scale,frontWidth/Math.max(1,safe.right-safe.x),safeHeight/Math.max(1,safe.bottom-safe.y));
+  // An opaque photo never shrinks below the print area: no empty margins on the product.
+  if(ink.opaque)scale=Math.max(scale,frame.w/w,frame.h/h);
   let x=frame.x+(frame.w-bw*scale)*focusX-b.x*scale;
   let y=frame.y+(frame.h-bh*scale)*focusY-b.y*scale;
   if(safe){
     const left=frame.x+(frame.w-frontWidth)/2;
     x=Math.max(left-safe.x*scale,Math.min(left+frontWidth-safe.right*scale,x));
-    y=Math.max(frame.y-safe.y*scale,Math.min(frame.y+frame.h-safe.bottom*scale,y));
+    y=Math.max(Math.max(frame.y,safeTop)-safe.y*scale,Math.min(frame.y+frame.h-safe.bottom*scale,y));
+  }
+  if(ink.opaque){
+    x=Math.min(frame.x,Math.max(frame.x+frame.w-w*scale,x));
+    y=Math.min(frame.y,Math.max(frame.y+frame.h-h*scale,y));
   }
   return {x,y,w:w*scale,h:h*scale};
 }
@@ -795,9 +847,11 @@ function coverSource(image,design,captionRatio=null,faces=[]){
     const scale=Math.max(c.width/bw,frame.h/bh),sw=c.width/scale,sh=frame.h/scale;
     ctx.drawImage(image,b.x+(bw-sw)*fx,b.y+(bh-sh)*fy,sw,sh,0,frame.y,c.width,frame.h);
   }else{
-    const pos=placeCoverSubject(image,ink,faces,frame,c.width*frontRatio,fx,fy);
-    ctx.save();ctx.beginPath();ctx.rect(0,frame.y,c.width,frame.h);ctx.clip();
-    const spills=pos.x>0.5||pos.x+pos.w<c.width-.5||pos.y>frame.y+.5||pos.y+pos.h<frame.y+frame.h-.5;
+    // Opaque photos cover the whole surface; faces stay below the camera when the photo allows it.
+    const target=ink.opaque?{x:0,y:0,w:c.width,h:Math.max(1,c.height*(1-band))}:frame;
+    const pos=placeCoverSubject(image,ink,faces,target,c.width*frontRatio,fx,fy,frame.y);
+    ctx.save();ctx.beginPath();ctx.rect(0,target.y,c.width,target.h);ctx.clip();
+    const spills=pos.x>0.5||pos.x+pos.w<c.width-.5||pos.y>target.y+.5||pos.y+pos.h<target.y+target.h-.5;
     const source=ink.opaque&&spills?window.EJDERPhotoLayout.soften(image):image;
     ctx.drawImage(source,pos.x,pos.y,pos.w,pos.h);ctx.restore();
   }
@@ -879,7 +933,7 @@ function drawCanvasTo(canvas,includePhotos=true,showSelection=false,design=edito
     ctx.scale(canvas.width/W,canvas.height/H);paintProduct(ctx,design);
   }
   ctx.save();
-  if(artworkOnly&&!round){ctx.beginPath();ctx.rect(area.x,area.y,area.w,area.h);}
+  if(artworkOnly&&(!round||design.printSquare)){ctx.beginPath();ctx.rect(area.x,area.y,area.w,area.h);}
   else surfacePath(ctx,area.x,area.y,area.w,area.h,design);
   ctx.clip();
   if(design.printBackground==='color'){ctx.fillStyle=design.printBackgroundColor||'#ffffff';ctx.fillRect(area.x,area.y,area.w,area.h);}
@@ -914,8 +968,15 @@ function drawCanvasTo(canvas,includePhotos=true,showSelection=false,design=edito
     items.push({kind:'text',layer,text,font,edge,inkHeight,width:Math.max(1,left+right)+edge+7,
       height:inkHeight+edge+7,offsetX:(left-right)/2,offsetY:(top-bottom)/2});
   }
+  // Several opaque photos in a filling mode become an edge-to-edge collage.
+  let collageArt=[];
+  const coverLike=design.fillMode==='cover'||design.fillMode==='smart'&&design.product==='keychain';
+  const artItems=items.filter(i=>i.kind!=='text');
+  if(!backgroundArt&&coverLike&&artItems.length>1&&artItems.every(i=>visibleInk(i.image).opaque)){
+    collageArt=artItems;for(const art of artItems)items.splice(items.indexOf(art),1);
+  }
   const textItems=items.filter(i=>i.kind==='text');
-  const hasBackground=!!backgroundArt||!!design.backgroundLayout;
+  const hasBackground=!!backgroundArt||!!design.backgroundLayout||collageArt.length>0;
   const autoLines=textItems.filter(item=>item.layer.autoPosition);
   const autoCaption=autoLines.length>0&&(hasBackground||items.some(item=>item.kind!=='text'));
   if(autoCaption)for(const item of autoLines){item.width=Math.max(1,item.width-7);item.height=Math.max(1,item.height-7);}
@@ -927,10 +988,10 @@ function drawCanvasTo(canvas,includePhotos=true,showSelection=false,design=edito
     const {image:source,layer,kind}=backgroundArt;
     const image=coverSource(source,design,caption?.ratio??null,backgroundArt.faces),iw=image.naturalWidth||image.width,ih=image.naturalHeight||image.height;
     function paintCover(frame){
-      const scale=Math.max(frame.w/iw,frame.h/ih)*(layer.zoom||1),dw=iw*scale,dh=ih*scale;
-      const x=frame.x-(dw-frame.w)*(design.focusX??.5)+(layer.panX||0)*area.w/2,y=frame.y-(dh-frame.h)*(design.focusY??.5)+(layer.panY||0)*area.h/2;
-      ctx.save();ctx.translate(x+dw/2,y+dh/2);ctx.rotate((layer.angle||0)*Math.PI/180);ctx.drawImage(image,-dw/2,-dh/2,dw,dh);ctx.restore();
-      return {id:layer.id,x:x+dw/2,y:y+dh/2,w:dw,h:dh};
+      const angle=(layer.angle||0)*Math.PI/180;
+      const fit=coverFit(frame,iw,ih,layer.zoom,angle,{focusX:design.focusX??.5,focusY:design.focusY??.5},(layer.panX||0)*area.w/2,(layer.panY||0)*area.h/2);
+      ctx.save();ctx.translate(fit.cx,fit.cy);ctx.rotate(angle);ctx.drawImage(image,-fit.w/2,-fit.h/2,fit.w,fit.h);ctx.restore();
+      return {id:layer.id,x:fit.cx,y:fit.cy,w:fit.w,h:fit.h};
     }
     let bounds=paintCover(area);
     if(caption&&image===source){
@@ -938,6 +999,8 @@ function drawCanvasTo(canvas,includePhotos=true,showSelection=false,design=edito
       ctx.save();ctx.beginPath();ctx.rect(frame.x,frame.y,frame.w,frame.h);ctx.clip();bounds=paintCover(frame);ctx.restore();
     }
     if(showSelection&&kind==='photo')selectedBounds.push(bounds);
+  }else if(collageArt.length){
+    drawCollage(ctx,collageArt,caption?{...area,h:caption.top-area.y}:area,area,design,showSelection);
   }
   let layoutArea=hasBackground?{...area,y:caption?.top??(area.y+area.h-bandHeight),h:bandHeight}:area;
   if(!hasBackground&&imageCount>0&&design.product.startsWith('case')&&(imageCount>1||design.surfaceVersion>=4)){
@@ -1020,6 +1083,15 @@ function drawStudio(){
     ?words(`${temporaryImagesCount()} geçici fotoğraf · yaklaşık ${totalTemporaryKB()} KB`,`${temporaryImagesCount()} temporäre Fotos · ca. ${totalTemporaryKB()} KB`)
     :words('Geçici fotoğraf yok','Keine temporären Fotos');
 }
+// Narrow bridge for print-studio.js (print files and automatic sharpness).
+window.EJDERStudio=Object.freeze({
+  editor:()=>editor,language:()=>language,words,notify,redraw:()=>{if(studioCanvas)drawStudio();updatePhotoControls();},
+  photos:()=>cachedImages,pending:()=>pendingPhotos.size,printArea:design=>printArea(design),
+  faces:()=>{const list=[faceDesign('front')];if(hasBack())list.push(faceDesign('back'));return list.filter(faceHasContent);},
+  ready:async faces=>!(await Promise.all(faces.flatMap(f=>[...letteringReady(f),...(f.themeApplied?[studioMedia('themes/'+f.template+'.webp').ready]:[])]))).includes(false),
+  draw:(canvas,design)=>drawCanvasTo(canvas,true,false,design,true),
+  productName:()=>name(PRODUCTS.find(p=>p.id===editor.product)||PRODUCTS[0])
+});
 function refreshStudio(){
   if(currentRoute()[0]!=='studio')return;
   const focus=document.activeElement,elId=focus?.id;
@@ -1071,7 +1143,7 @@ function updateControlValues(){
   updatePhotoControls();
   for(const b of ROOT.querySelectorAll('[data-layer-id]'))b.classList.toggle('active',b.dataset.layerId===editor.selected);
 }
-function updatePhotoControls(){const l=selectedLayer();if(l?.type!=='image')return;for(const [id,key] of [['photoZoom','zoom'],['photoX','panX'],['photoY','panY']]){const el=document.getElementById(id);if(el)el.value=l[key]??(key==='zoom'?1:0);}const out=document.getElementById('photoZoomOutput');if(out)out.textContent=Math.round((l.zoom||1)*100)+'%';}
+function updatePhotoControls(){const l=selectedLayer();if(l?.type!=='image')return;for(const [id,key] of [['photoZoom','zoom'],['photoX','panX'],['photoY','panY'],['photoAngle','angle']]){const el=document.getElementById(id);if(el)el.value=l[key]??(key==='zoom'?1:0);}const out=document.getElementById('photoZoomOutput');if(out)out.textContent=Math.round((l.zoom||1)*100)+'%';const ang=document.getElementById('photoAngleOutput');if(ang)ang.textContent=(l.angle||0)+'°';const p=cachedImages.get(l.key),sh=document.getElementById('photoSharpen'),so=document.getElementById('photoSharpenOutput');if(sh&&p){const v=window.EJDERPrint?.wanted(l,p);if(v!=null&&document.activeElement!==sh)sh.value=v;}if(so)so.textContent=window.EJDERPrint?.sharpLabel(l,p)||'';}
 async function setPhotoBackground(mode){
  const l=selectedLayer(),p=l&&cachedImages.get(l.key),ticket=imageTicket;if(!p)return;
  const request=p.backgroundRequest=(p.backgroundRequest||0)+1;
@@ -1130,8 +1202,8 @@ async function processPhotoFile(file){
     if(myTicket!==imageTicket)return;
     cachedImages.set(key,{img:small,url:resultURL,bytes:compressed.size,focus});resultURL=null;
     rememberUndo();
-    const l={id:newId(),type:'image',key,autoFit:true,x:.5,y:.5,size:Math.min(130,printArea().w*.92),angle:0,autoPosition:true,zoom:1,panX:0,panY:0,background:'keep'};
-    if(editor.product==='keychain')editor.fillMode='smart';
+    const l={id:newId(),type:'image',key,autoFit:true,x:.5,y:.5,size:Math.min(130,printArea().w*.92),angle:0,autoPosition:true,zoom:1,panX:0,panY:0,background:'keep',sharpen:'auto'};
+    editor.fillMode=editor.product==='keychain'?'smart':editor.fillMode==='contain'?'contain':'cover';
     editor.themeApplied=false;
     editor.layers.push(l);editor.selected=l.id;editor.tool='photo';
     refreshStudio();
@@ -1346,12 +1418,12 @@ ROOT.addEventListener('click', ev=>{
       action.textContent=opened?tr('giftClose'):tr('giftOpen');action.setAttribute('aria-expanded',String(!!opened));return;
     }
     case 'add-text':addText();document.getElementById('textInput')?.focus();return;
-    case 'fit-photo':{const l=selectedLayer();if(l?.type!=='image')return;rememberUndo();Object.assign(l,{zoom:1,panX:0,panY:0,x:.5,y:.5,angle:0,autoPosition:true,size:130});editor.fillMode='contain';refreshStudio();return;}
+    case 'fit-photo':{const l=selectedLayer();if(l?.type!=='image')return;rememberUndo();Object.assign(l,{zoom:1,panX:0,panY:0,x:.5,y:.5,angle:0,autoPosition:true,size:130});editor.fillMode=editor.product==='keychain'?'smart':'cover';editor.focusX=editor.focusY=.5;refreshStudio();return;}
     case 'remove-layer':{
       if(!selectedLayer()){notify(tr('toastNoSelected'));return;}
       rememberUndo();const l=selectedLayer();editor.layers=editor.layers.filter(x=>x.id!==l.id);
       if(l.type==='image'){
-        const ph=cachedImages.get(l.key);if(ph){URL.revokeObjectURL(ph.url);ph.img.removeAttribute('src');if(ph.cutoutURL)URL.revokeObjectURL(ph.cutoutURL);ph.cutout?.removeAttribute('src');cachedImages.delete(l.key);}
+        const ph=cachedImages.get(l.key);if(ph){window.EJDERPrint?.disposeSharp(ph);URL.revokeObjectURL(ph.url);ph.img.removeAttribute('src');if(ph.cutoutURL)URL.revokeObjectURL(ph.cutoutURL);ph.cutout?.removeAttribute('src');cachedImages.delete(l.key);}
         undoStack=[];redoStack=[];
       }
       editor.selected=editor.layers[editor.layers.length-1]?.id||null;refreshStudio();return;
@@ -1367,6 +1439,8 @@ ROOT.addEventListener('click', ev=>{
     case 'download':downloadCanvas();return;
     case 'download-art':downloadCanvas(true);return;
     case 'workshop-pack':downloadWorkshopPackage();return;
+    case 'print-file':window.EJDERPrint?.open();return;
+    case 'sharpen-auto':{const l=selectedLayer();if(l?.type!=='image')return;rememberUndo();l.sharpen='auto';drawStudio();updatePhotoControls();return;}
   }
 });
 let inputUndoState=null;
@@ -1375,7 +1449,7 @@ ROOT.addEventListener('focusin',ev=>{
     const existing=editor.layers.find(l=>l.type==='text');
     if(existing){editor.selected=existing.id;updateControlValues();drawStudio();}
   }
-  if(['sizeInput','angleInput','textColorInput','textInput','photoZoom','photoX','photoY','focusX','focusY','printBackgroundColor'].includes(ev.target.id))inputUndoState=snapshotUndo();
+  if(['sizeInput','angleInput','textColorInput','textInput','photoZoom','photoX','photoY','photoAngle','photoSharpen','focusX','focusY','printBackgroundColor'].includes(ev.target.id))inputUndoState=snapshotUndo();
 });
 ROOT.addEventListener('input',ev=>{
   const el=ev.target;const l=selectedLayer();
@@ -1403,6 +1477,8 @@ ROOT.addEventListener('input',ev=>{
   if(el.id==='focusX'||el.id==='focusY'){editor[el.id]=Math.max(0,Math.min(1,Number(el.value)));drawStudio();return;}
   if(!l)return;
   if(l.type==='image'&&['photoZoom','photoX','photoY'].includes(el.id)){l[{photoZoom:'zoom',photoX:'panX',photoY:'panY'}[el.id]]=Number(el.value);updatePhotoControls();drawStudio();return;}
+  if(l.type==='image'&&el.id==='photoAngle'){l.angle=Number(el.value);updatePhotoControls();drawStudio();return;}
+  if(l.type==='image'&&el.id==='photoSharpen'){l.sharpen=Number(el.value);updatePhotoControls();drawStudio();return;}
   if(el.id==='textInput'&&l.type==='text'){l.text=el.value.slice(0,80);drawStudio();return;}
   if(el.id==='textColorInput'&&l.type==='text'){l.autoColor=false;l.color=el.value;drawStudio();return;}
   if(el.id==='sizeInput'){if(l.type==='image')l.autoFit=false;l.size=Number(el.value);document.getElementById('sizeOutput').textContent=el.value;drawStudio();return;}
@@ -1434,7 +1510,7 @@ ROOT.addEventListener('change',ev=>{
     if(field==='font')loadFace(el.value);
     drawStudio();return;
   }
-  if(['sizeInput','angleInput','textColorInput','textInput','photoZoom','photoX','photoY','focusX','focusY','printBackgroundColor'].includes(el.id)){
+  if(['sizeInput','angleInput','textColorInput','textInput','photoZoom','photoX','photoY','photoAngle','photoSharpen','focusX','focusY','printBackgroundColor'].includes(el.id)){
     if(inputUndoState&&inputUndoState!==snapshotUndo()&&undoStack.at(-1)!==inputUndoState){undoStack.push(inputUndoState);if(undoStack.length>22)undoStack.shift();redoStack.length=0;}
     inputUndoState=null;
     if(selectedLayer()){
