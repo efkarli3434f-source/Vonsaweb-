@@ -1,26 +1,107 @@
-EJDER STUDIO — TEK KLASOR OLMADAN TAM SITE / VOLLSTAENDIGE WEBSITE OHNE EXTRA-ORDNER
-6 Kasim / November 2026
+EJDER STUDIO — STRATO KURULUMU / STRATO-EINRICHTUNG
+Sürüm / Version 7.50 · 6 Kasım / November 2026
 
-TURKCE
-- Bu ZIP icindeki index.html DOSYASI ZIP'in en ust duzeyindedir. Icinde ejder-site veya EJDER_Studio diye ikinci bir klasor yoktur.
-- STRATO: Alan adinizin bagli oldugu web kok klasorunu (document root / Zielverzeichnis) kontrol edin.
-- Site dosyalarini o klasore cikarip index.html'nin dogrudan o klasorde bulunmasini saglayin.
-- ZIP'i STRATO ana klasorunde acip olusturdugu alt klasorun icinde birakmayin.
-- ZIP icindeki assets/, tasarim/, gestalten/ klasorlerini ve tum dosyalari bir arada yukleyin.
-- /ejder-site/EJDER_Studio/ daha once kullanilan yoldu; ancak STRATO panelinizde alan adinin gercek hedef klasorunu dogrulayin.
-- Bu paket 7.36 tam site yedegine dayalidir; 7.42a, 7.43, 7.44 asistan duzeltmeleri sirayla eklenmistir.
-- SON anahtarlik / kapusonlu V745 ve V746 yamalari KASITLI OLARAK UYGULANMAMISTIR.
-- 7.37-7.43 donemindeki baska yayin degisikliklerinin eksiksiz kaynaklari mevcut degildir; bire bir son canli hal oldugu iddia edilmez.
-- Sunucuya yeni kuruluyorsa magaza hesabiniz ve islem verileri farkli sunucu dosyalarinda tutuluyor olabilir; bu paket, silinen sunucu verilerini geri getirmez.
-- Test: /index.html ve /de.html ana sayfalari; urun sayfalari, 3D, sepet ve asistan. Mobilde asistan mikrofonu icin HTTPS ve izinler gerekir.
-- Mevcut sunucu dosyalarini silmeden once haricen yedek alin. Domain yonlendirmesiyle oynarken tek tek kontrol edin.
+TÜRKÇE
+======
+
+1) Yedek al
+   Sunucudaki mevcut dosyaları ve varsa EJDER_SHOP_DATA ile EJDER_CONFIG
+   klasörlerini bilgisayarına indir.
+
+2) Domainin hedef klasörünü kontrol et
+   STRATO müşteri girişi → Domainler → Domain yönetimi → domainin "Hedef"
+   (Ziel / Zielverzeichnis) klasörüne bak.
+   Önerilen: domain webspace içinde ayrı bir klasöre bağlı olsun
+   (örn. /ejderstudio). Mağaza verileri o klasörün bir üstünde
+   (/EJDER_SHOP_DATA) durur ve web'den hiç görünmez.
+   Domain doğrudan kök klasöre "/" bağlıysa da çalışır: site verilerini
+   kendi içindeki korumalı EJDER_SHOP_DATA klasörüne yazar (.htaccess ile
+   kapalıdır, dosyalar 404 döndürür). Eski kurulumda veriler bir üst
+   klasördeyse onlar kullanılmaya devam eder.
+
+3) Dosyaları yükle
+   ZIP'in İÇERİĞİNİ hedef klasöre koy: index.html doğrudan o klasörde
+   olmalı (ikinci bir alt klasör oluşmamalı). assets/, tasarim/,
+   gestalten/ klasörleri ve .htaccess dosyası da yüklenmeli.
+   .htaccess gizli dosyadır: FTP programında "gizli dosyaları göster"
+   seçeneğini aç.
+
+4) PHP sürümü
+   STRATO panelinde PHP 8.1 veya üzeri seç (8.3 önerilir).
+
+5) SSL / HTTPS
+   STRATO'da domain için SSL'i etkinleştir. Sonra .htaccess dosyasındaki
+   iki satırın başındaki # işaretini sil (HTTPS'e otomatik yönlendirme).
+   Admin girişi, uygulama kurulumu ve asistan mikrofonu HTTPS ister.
+   Site hem ejderstudio.com hem www.ejderstudio.com ile çalışır.
+
+6) Mağaza yönetimi (admin) ilk kurulum — yalnız bir kez
+   a) Domainin hedef klasörünün BİR ÜSTÜNDE "EJDER_CONFIG" klasörü
+      oluştur. (Domain kök "/"e bağlıysa EJDER_CONFIG'i site klasörünün
+      içine koyabilirsin; web'den erişim .htaccess ile kapalıdır.)
+   b) İçine "shop-setup.php" adında şu dosyayı koy (kodu ve tarihi değiştir):
+        <?php return ['token_hash' => hash('sha256', 'BURAYA-UZUN-GIZLI-KOD'), 'expires' => strtotime('2026-11-30')];
+      Yalnız şifreyle başlamak istersen (2FA'yı sonra açarsın) dizinin
+      sonuna şunu ekle:  , 'password_only_setup' => true
+   c) https://ALANADIN/magaza-admin.html aç, kodu gir, şifreni (12–72
+      karakter) ve doğrulama uygulamanı kur. Kurtarma kodunu sakla.
+   d) Kurulum bitince shop-setup.php dosyasını sil.
+   Mevcut kurulumdan gelen admin verileri varsa bu adım gerekmez.
+
+7) Açılış testi
+   - https://ALANADIN/ ve /de.html (TR/DE ana sayfa)
+   - Ürünler → Telefon kılıfları (35 model, markaya göre gruplu)
+   - /tasarim/iphone-17-pro/ ve /gestalten/samsung-galaxy-s26/
+   - Stüdyo: fotoğraf yükle → ürün boşluksuz kaplanmalı → 3D vitrin
+   - "Baskıya hazırla" → PDF ve PNG indir
+   - Satış vitrini, sepet, hesabım, magaza-admin.html, asistan
+   Güncellemeden sonra eski sürüm görünürse sayfayı bir kez yenile;
+   çevrimdışı önbellek (servis çalışanı) yeni sürümü kendisi alır.
+
+8) Bütçeli süblimasyon / 3D vakum baskı
+   - Süblimasyon mürekkepli yazıcı (ör. EcoTank) + süblimasyon kâğıdı,
+     kılıf ve kupa için 3D vakum süblimasyon makinesi veya pres.
+   - Stüdyoda "Baskıya hazırla"yı aç. Ölçü (mm), taşma payı, DPI, ayna,
+     kâğıt (A4/A3) ve adet ürün başına bu tarayıcıda hatırlanır.
+   - PDF'i aç → Yazdır → "Gerçek boyut / %100", ölçekleme KAPALI.
+     Dosya zaten aynalı olduğu için yazıcının ayna ayarını KAPALI bırak.
+   - İlk baskıda sayfanın altındaki 50 mm kontrol çizgisini cetvelle ölç.
+   - Telefon kılıfı: arka yüz + her kenarda yaklaşık 8 mm yan sarma.
+   - Kupa: iki yüz tasarlandıysa tek sarma şeridi (kenarlar kulp tarafı).
+   - DTF/transfer yazıcı için PNG (şeffaf, DPI bilgili) kullanılabilir.
+   Varsayılan ölçüler genel boş ürünlere göredir; kendi boş ürününün
+   şablonuna göre bir kez ayarla.
 
 DEUTSCH
-- index.html liegt DIREKT im ZIP-Hauptverzeichnis. Keine zusaetzliche Ordner-Ebene.
-- Im STRATO-Dateimanager das tatsaechliche Zielverzeichnis Ihrer Domain pruefen.
-- Den gesamten ZIP-INHALT in dieses Zielverzeichnis entpacken: index.html, assets/, tasarim/, gestalten/ usw.
-- Grundlage: vollstaendige Version 7.36; Sprachassistent-Aktualisierungen 7.42a/7.43/7.44 ergaenzt.
-- Die letzten Aenderungen V745/V746 fuer Schluesselanhaenger und Hoodie wurden bewusst nicht uebernommen.
-- Spaetere, nicht gesicherte Layout-Aenderungen lassen sich nicht als exakt wiederhergestellt bestaetigen.
-- Gesonderte Server-Daten (z. B. echte Kunden-/Admin-Datensaetze) sind kein Bestandteil dieses Codesicherungs-Pakets.
-- Nach dem Upload auf Deutsch, Tuerkisch, Mobilgeraet, 3D-Editor und Assistent testen.
+=======
+
+1) Sicherung: vorhandene Dateien und ggf. EJDER_SHOP_DATA und EJDER_CONFIG
+   herunterladen.
+2) Zielverzeichnis der Domain prüfen (STRATO Login → Domains →
+   Domainverwaltung → Ziel). Empfohlen ist ein eigener Ordner
+   (z. B. /ejderstudio); die Shopdaten liegen dann eine Ebene darüber.
+   Zeigt die Domain auf das Webspace-Hauptverzeichnis "/", nutzt die Seite
+   automatisch einen geschützten Ordner EJDER_SHOP_DATA im Seitenordner.
+   Vorhandene Daten eine Ebene höher werden weiter verwendet.
+3) Den ZIP-INHALT in das Zielverzeichnis hochladen (index.html direkt dort,
+   inkl. assets/, tasarim/, gestalten/ und der versteckten Datei .htaccess).
+4) PHP 8.1 oder neuer wählen (8.3 empfohlen).
+5) SSL bei STRATO aktivieren und danach in .htaccess bei den zwei Zeilen
+   das # entfernen (HTTPS-Weiterleitung). Admin-Login, App-Installation
+   und Mikrofon benötigen HTTPS. Mit und ohne www nutzbar.
+6) Shopverwaltung einmalig einrichten:
+   Ordner EJDER_CONFIG eine Ebene über dem Zielverzeichnis anlegen (bei
+   Ziel "/" im Seitenordner) und darin shop-setup.php ablegen:
+     <?php return ['token_hash' => hash('sha256', 'HIER-LANGER-GEHEIMER-CODE'), 'expires' => strtotime('2026-11-30')];
+   Optional für Start nur mit Passwort: , 'password_only_setup' => true
+   Dann https://DOMAIN/magaza-admin.html öffnen, Code eingeben, Passwort und
+   Authenticator einrichten, Wiederherstellungscode sichern und
+   shop-setup.php wieder löschen.
+7) Test: Startseite TR/DE, Handyhüllen (35 Modelle nach Marken),
+   /gestalten/samsung-galaxy-s26/, Foto hochladen (randlos), 3D-Vitrine,
+   "Druck vorbereiten" → PDF/PNG, Shop, Warenkorb, Konto, Admin, Assistent.
+8) Sublimationsdruck: PDF mit "Tatsächliche Größe / 100 %" ohne Skalierung
+   drucken, Spiegeln im Drucker AUS (Datei ist bereits gespiegelt),
+   50-mm-Kontrolllinie nachmessen. Hülle: Rückseite + ca. 8 mm Seiten.
+   Tasse: beide Seiten als eine Wicklung (Ränder = Henkelseite).
+   Für DTF/Transfer die PNG-Datei (transparent, mit DPI) verwenden.

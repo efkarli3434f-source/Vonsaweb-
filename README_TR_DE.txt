@@ -1,5 +1,89 @@
 EJDER Studio · 3D Tasarım Atölyesi / 3D-Designatelier
-Sürüm / Version 7.0 · 02.11.2026
+Sürüm / Version 7.50 · 06.11.2026
+
+V7.50 · BOŞLUKSUZ YERLEŞİM, OTOMATİK NETLİK, BASKI DOSYASI, 35 KILIF
+V7.50 · RANDLOS, AUTOMATISCHE SCHÄRFE, DRUCKDATEI, 35 HÜLLEN
+
+TR
+Fotoğraf her üründe baskı alanını kenardan kenara kaplar; üründe boşluk
+kalmaz. Büyütme, kaydırma ve döndürme serbesttir ama fotoğrafın kenarı hiçbir
+zaman baskı alanının içine girmez. Anahtarlıkta yuvarlak alan tamamen dolar.
+Birden fazla fotoğraf boşluksuz kolaj olur. Kılıfta fotoğraf tüm arka yüzü
+kaplar; yüz bulunduysa mümkün olduğunca kameranın altında tutulur.
+"Ortala ve tam kapla" ilk yerleşime döndürür. Şeffaf PNG motifler kesilmez.
+
+Netlik her fotoğraf için otomatik ayarlanır (çözünürlük ve bulanıklık
+ölçülür, yalnız parlaklık kanalında yumuşak eşikli keskinleştirme). Ön
+izleme, 3D vitrin ve baskı dosyası aynı netliği kullanır. Fotoğraf
+ayarlarındaki "Netlik" kaydırıcısıyla elle değiştirilebilir (0 = kapalı),
+"Netliği otomatik yap" ile geri alınır. İşlem cihazda yapılır.
+
+"Baskıya hazırla (PDF / PNG)": gerçek ölçüde (mm) 300 DPI baskı dosyası.
+Taşma payı, kesim işaretleri, 50 mm kontrol çizgisi, süblimasyon için ayna,
+A4/A3/tasarım boyutunda kâğıt ve adet seçilir. Kupada iki yüz tek sarma
+şeridinde birleşir. PNG dosyası DPI bilgisini taşır ve şeffaflığı korur.
+Ürün başına ölçüler bu tarayıcıda hatırlanır. Fotoğraf çözünürlüğü baskı
+ölçüsüne göre (DPI) gösterilir. Yazdırırken "Gerçek boyut / %100" seç.
+
+Kılıf kataloğu 12 modelden 35 modele çıktı (aşağıdaki liste). Her yeni
+model, mevcut modellerle aynı sistemi kullanır: 3D model, stüdyo görseli,
+renk maskesi, kamera güvenli alanı, baskı alanı, TR/DE giriş sayfası ve
+çevrimdışı önbellek. Kılıflar sayfası markalara göre gruplanır.
+
+DE
+Fotos füllen die Druckfläche jedes Produkts randlos. Vergrößern, Verschieben
+und Drehen bleiben möglich, ohne dass eine Fotokante in die Fläche rückt. Der
+runde Anhänger wird vollständig gefüllt, mehrere Fotos werden zur lückenlosen
+Collage. Auf Hüllen deckt das Foto die ganze Rückseite; erkannte Gesichter
+bleiben möglichst unter der Kamera. Transparente PNG-Motive bleiben vollständig.
+
+Die Schärfe wird für jedes Foto automatisch eingestellt (Auflösung und
+Unschärfe werden gemessen) und gilt für Vorschau, 3D und Druckdatei. Der
+Regler "Schärfe" erlaubt manuelle Werte (0 = aus). Alles läuft lokal.
+
+"Druck vorbereiten (PDF / PNG)": Druckdatei in Originalgröße mit 300 DPI,
+Beschnitt, Schnittmarken, 50-mm-Kontrolllinie, Spiegelung für Sublimation,
+A4/A3/Motivgröße und Anzahl. Tassen: beide Seiten als eine Wicklung. Die PNG
+enthält die DPI-Angabe und bleibt transparent. Maße werden je Produkt im
+Browser gespeichert. Beim Drucken "Tatsächliche Größe / 100 %" wählen.
+
+Der Hüllenkatalog umfasst jetzt 35 statt 12 Modelle (Liste unten), alle mit
+demselben System wie die bisherigen Modelle.
+
+YENİ CİHAZ ÖLÇÜLERİ / NEUE GERÄTEABMESSUNGEN (Höhe × Breite × Tiefe, mm)
+Apple iPhone 17 Pro          150,00 × 71,90 × 8,75   https://www.phonearena.com/phones/compare/Apple-iPhone-17-Pro,Apple-iPhone-Air/phones/12495,12559
+Apple iPhone Air             156,20 × 74,70 × 5,64   (aynı kaynak / gleiche Quelle)
+Apple iPhone 16 Pro          149,60 × 71,50 × 8,25   Apple teknik özellikler / Apple Technische Daten
+Apple iPhone 16 Plus         160,90 × 77,80 × 7,80   Apple teknik özellikler / Apple Technische Daten
+Apple iPhone 16e             146,70 × 71,50 × 7,80   Apple teknik özellikler / Apple Technische Daten
+Apple iPhone 15 Pro Max      159,90 × 76,70 × 8,25   Apple teknik özellikler / Apple Technische Daten
+Apple iPhone 15 Pro          146,60 × 70,60 × 8,25   Apple teknik özellikler / Apple Technische Daten
+Apple iPhone 15              147,60 × 71,60 × 7,80   Apple teknik özellikler / Apple Technische Daten
+Apple iPhone 14              146,70 × 71,50 × 7,80   Apple teknik özellikler / Apple Technische Daten
+Apple iPhone 13              146,70 × 71,50 × 7,65   Apple teknik özellikler / Apple Technische Daten
+Samsung Galaxy S26+          158,40 × 75,80 × 7,30   https://ts.ifixit.com/Device/Samsung_Galaxy_S26_Plus
+Samsung Galaxy S26           149,60 × 71,70 × 7,20   https://www.engadget.com/mobile/smartphones/samsung-galaxy-s26-vs-s26-vs-s26-ultra-comparing-the-three-new-phones-181047172.html
+Samsung Galaxy S25 Ultra     162,80 × 77,60 × 8,20   Samsung teknik özellikler / Samsung Technische Daten
+Samsung Galaxy S25           146,90 × 70,50 × 7,20   Samsung teknik özellikler / Samsung Technische Daten
+Samsung Galaxy S24 Ultra     162,30 × 79,00 × 8,60   Samsung teknik özellikler / Samsung Technische Daten
+Samsung Galaxy A56 5G        162,20 × 77,50 × 7,40   https://mnd-assets.mynewsdesk.com/raw/upload/fl_attachment/7rsruj7bsyxx2u692blqsa
+Samsung Galaxy A36 5G        162,90 × 78,20 × 7,40   https://www.phonearena.com/phones/compare/Samsung-Galaxy-A36-5G,Samsung-Galaxy-A16-5G/phones/12433,12426
+Samsung Galaxy A16 5G        164,40 × 77,90 × 7,90   (aynı kaynak / gleiche Quelle)
+Google Pixel 10 Pro          152,80 × 72,00 × 8,60   https://www.phonearena.com/phones/compare/Google-Pixel-10,Google-Pixel-10-Pro/phones/12651,12652
+Google Pixel 10              152,80 × 72,00 × 8,60   (aynı kaynak / gleiche Quelle)
+Google Pixel 9a              154,70 × 73,30 × 8,90   https://www.kimovil.com/en/compare/google-pixel-10,google-pixel-9a
+Xiaomi 15                    152,30 × 71,20 × 8,08   Xiaomi teknik özellikler / Xiaomi Technische Daten
+Xiaomi Redmi Note 14 Pro 5G  162,33 × 74,42 × 8,40   Xiaomi teknik özellikler / Xiaomi Technische Daten
+Kamera boşlukları ve kılıf şekilleri görsel amaçla modellenmiştir; üretimde
+boş kılıfın kendisini ve üreticinin şablonunu kontrol et.
+Kameraausschnitte und Hüllenformen dienen der Visualisierung; für die
+Produktion den echten Rohling und die Herstellervorlage prüfen.
+Üretici / Generator: tools/gen_cases.py, ölçüler / Maße: tools/case-models-spec.json
+
+STRATO: Ayrıntılı kurulum için STRATO_KURULUM_TR_DE.txt dosyasına bak.
+STRATO: Ausführliche Anleitung in STRATO_KURULUM_TR_DE.txt.
+
+-------------------------------------------------------------------------------
 
 V7 · 360° ÜRÜN VİTRİNİ / 360°-PRODUKTVITRINE
 
