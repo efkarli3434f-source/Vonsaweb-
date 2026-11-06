@@ -80,6 +80,13 @@ Kameraausschnitte und Hüllenformen dienen der Visualisierung; für die
 Produktion den echten Rohling und die Herstellervorlage prüfen.
 Üretici / Generator: tools/gen_cases.py, ölçüler / Maße: tools/case-models-spec.json
 
+Açık kaynak: Asistanın yedek sesi (meSpeak, GPL lisanslı) kaldırıldı; asistan
+cihazın kendi sesini kullanır, yazılı yanıtlar aynı kalır. Yüz bulma için pico.js
+(MIT) ve yazı tipleri (SIL OFL) lisans dosyalarıyla birlikte duruyor.
+Open Source: Die Ersatzstimme des Assistenten (meSpeak, GPL) wurde entfernt; der
+Assistent nutzt die Stimme des Geräts, Textantworten bleiben gleich. pico.js (MIT)
+für die Gesichtserkennung und die Schriften (SIL OFL) bleiben mit Lizenzdateien.
+
 STRATO: Ayrıntılı kurulum için STRATO_KURULUM_TR_DE.txt dosyasına bak.
 STRATO: Ausführliche Anleitung in STRATO_KURULUM_TR_DE.txt.
 

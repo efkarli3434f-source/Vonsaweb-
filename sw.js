@@ -1,9 +1,9 @@
 'use strict';
 const PREFIX='ejder-studio:'+new URL(self.registration.scope).pathname+':';
 // 7.50: print files, automatic sharpness, edge-to-edge photos and 23 new phone cases.
-const CACHE=PREFIX+'v7.50-print-20261106';
-const VOICE_CACHE=PREFIX+'voice-7.44-restore-20261106';
-const VOICE_FILES=['assistant-natural-tr.js','assistant-local-speech.js','assistant-voice.js','support.js'];
+const CACHE=PREFIX+'v7.51-print-20261106';
+const VOICE_CACHE=PREFIX+'voice-7.51-20261106';
+const VOICE_FILES=['assistant-natural-tr.js','assistant-voice.js','support.js'];
 const FILES=[
   "photo-tools.js",
   "photo-layout.js",
@@ -222,12 +222,7 @@ const FILES=[
   "assets/tote.webp",
   "assistant-knowledge.js",
   "assistant-voice.js",
-  "assistant-local-speech.js",
   "assistant-natural-tr.js",
-  "assets/vendor/mespeak/mespeak.js",
-  "assets/vendor/mespeak/mespeak-core.js",
-  "assets/vendor/mespeak/voices/tr.json",
-  "assets/vendor/mespeak/voices/de.json",
   "assistant-config.js",
   "assistant-conversation.js",
   "assistant-audio-worklet.js",
