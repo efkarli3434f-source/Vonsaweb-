@@ -37,3 +37,8 @@
 .case-brands button span{font-size:11px;color:#d9b9ad}
 .case-brand{scroll-margin-top:90px}
 .case-brand>h2{margin:26px 0 12px;font:600 clamp(20px,3vw,27px)/1.2 Georgia,"Times New Roman",serif;color:#ffe6b5;text-align:center}
+/* Poem / multi-line text */
+.poem-field textarea{width:100%;min-width:0;box-sizing:border-box;padding:10px 12px;border:1px solid #aa8058;border-radius:10px;background:#1b0b13;color:#fff0df;font:inherit;font-size:16px;line-height:1.45;text-align:center;resize:vertical;min-height:112px}
+.poem-field label small{font-weight:500;color:#dcc1b0}
+.poem-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.pr-auto{margin:0;color:#bfe3b0;font-size:12px}

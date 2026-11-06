@@ -252,6 +252,7 @@ const FILES=[
   "support.js",
   "print-studio.js",
   "print-studio.css",
+  "assets/studio-fonts-extra.css",
   "photo-sharpen-core.js",
   "photo-sharpen-worker.js",
   "assets/case-iphone17pro.webp",

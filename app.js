@@ -75,8 +75,21 @@ const FONTS={
   typewriter:{family:'"EJDER Typewriter",monospace',weight:'400',label:['Daktilo','Schreibmaschine'],bundled:true},
   posterBold:{family:'"EJDER Poster",sans-serif',weight:'700',label:['Afiş','Plakatschrift'],bundled:true},
   bookBold:{family:'"EJDER Book",serif',weight:'700',label:['Kalın Serif','Kräftige Serifenschrift'],bundled:true},
-  hand:{family:'cursive',weight:'italic',label:['El yazısı','Handschrift']}
+  hand:{family:'cursive',weight:'italic',label:['El yazısı','Handschrift']},
+  // Extra styles (SIL OFL), loaded on demand from assets/studio-fonts-extra.css.
+  elegant:{family:'"EJDER Elegant",cursive',weight:'700',label:['Zarif el yazısı','Elegante Schreibschrift'],bundled:true,extra:true},
+  lobster:{family:'"EJDER Lobster",cursive',weight:'400',label:['Kalın el yazısı','Kräftige Schreibschrift'],bundled:true,extra:true},
+  playfair:{family:'"EJDER Playfair",serif',weight:'italic 700',label:['Şık italik','Elegante Kursive'],bundled:true,extra:true},
+  note:{family:'"EJDER Note",cursive',weight:'700',label:['Doğal el yazısı','Natürliche Handschrift'],bundled:true,extra:true},
+  tall:{family:'"EJDER Tall",sans-serif',weight:'400',label:['Uzun başlık','Hohe Titelschrift'],bundled:true,extra:true},
+  roman:{family:'"EJDER Roman",serif',weight:'700',label:['Antik başlık','Antike Versalien'],bundled:true,extra:true},
+  round:{family:'"EJDER Round",sans-serif',weight:'700',label:['Yuvarlak','Abgerundet'],bundled:true,extra:true}
 };
+let extraFonts=null;
+function loadExtraFonts(){
+  if(!extraFonts)extraFonts=new Promise(resolve=>{const link=document.createElement('link');link.rel='stylesheet';link.href='assets/studio-fonts-extra.css?v=7.50';link.onload=()=>resolve(true);link.onerror=()=>{extraFonts=null;resolve(false);};document.head.append(link);});
+  return extraFonts;
+}
 const FINISHES={plain:['Düz renk','Einfarbig'],outline:['Kontur','Kontur'],foil:['Altın varak','Goldfolie']};
 const fontLoads=new Map();
 function fontSpec(id,size){
@@ -86,8 +99,8 @@ function fontSpec(id,size){
 function loadFace(id){
   if(!FONTS[id]?.bundled)return Promise.resolve(true);
   if(!fontLoads.has(id)){
-    const load=document.fonts?.load(fontSpec(id,56),'ŞĞİÜÖÇß');
-    fontLoads.set(id,load?load.then(faces=>{if(faces.length)drawStudio();return !!faces.length;},()=>false):Promise.resolve(false));
+    const load=(FONTS[id].extra?loadExtraFonts():Promise.resolve(true)).then(()=>document.fonts?.load(fontSpec(id,56),'ŞĞİÜÖÇßa'));
+    fontLoads.set(id,load.then(faces=>{if(faces?.length)drawStudio();return !!faces?.length;},()=>false));
   }
   return fontLoads.get(id);
 }
@@ -275,10 +288,14 @@ function putSaved(items) {
   return writeStore(STORE_KEY, JSON.stringify(items.slice(0,20)));
 }
 function newId() { return 'e' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
-function textLayer(text = '') {
+function textLayer(text = '', poem = false) {
 
-  return {id:newId(),type:'text',text:String(text).slice(0,80),font:editor.fontChoice,finish:editor.finishChoice,color:defaultInk(editor),autoColor:true,size:editor.product.startsWith('case')?60:56,angle:0,x:.5,y:.5,autoPosition:true};
+  const layer={id:newId(),type:'text',text:String(text).slice(0,poem?600:80),font:editor.fontChoice,finish:editor.finishChoice,color:defaultInk(editor),autoColor:true,size:editor.product.startsWith('case')?60:56,angle:0,x:.5,y:.5,autoPosition:true};
+  // A poem or several lines without a photo: fitted to the product automatically.
+  if(poem)Object.assign(layer,{poem:true,autoSize:true,size:48});
+  return layer;
 }
+function poemLines(text){const lines=String(text||'').slice(0,600).replace(/\r/g,'').split('\n').map(s=>s.replace(/\s+$/,'')).slice(0,14);while(lines.length&&!lines[0].trim())lines.shift();while(lines.length&&!lines.at(-1).trim())lines.pop();return lines;}
 function addText(text = '') {
   const empty=editor.layers.find(l=>l.type==='text'&&!l.text.trim());
   if(empty){editor.selected=empty.id;updateControlValues();drawStudio();return;}
@@ -337,10 +354,10 @@ function disposeTemporaryPhotos(updateUI=true) {
   if(updateUI)refreshStudio();else{studioCanvas=null;selectedBounds=[];dragging=null;}
 }
 function storedTextLayers(layers){return (Array.isArray(layers)?layers:[]).filter(l=>l&&l.type==='text'&&String(l.text||'').trim()).slice(0,15).map(l=>({
-      id:String(l.id),type:'text',text:String(l.text||'').slice(0,80),autoPosition:l.autoPosition===true,autoColor:l.autoColor===true,
+      id:String(l.id),type:'text',text:String(l.text||'').slice(0,l.poem===true?600:80),...(l.poem===true?{poem:true,autoSize:l.autoSize!==false}:{}),autoPosition:l.autoPosition===true,autoColor:l.autoColor===true,
       font:Object.hasOwn(FONTS,l.font)?l.font:'serif',finish:Object.hasOwn(FINISHES,l.finish)?l.finish:'plain',
       color:/^#[a-f\d]{6}$/i.test(l.color)?l.color:'#e8b974',
-      size:Math.min(130,Math.max(22,Number(l.size)||60)),
+      size:Math.min(l.poem===true?220:130,Math.max(l.poem===true?10:22,Number(l.size)||60)),
       angle:Math.min(180,Math.max(-180,Number(l.angle)||0)),
       x:Math.min(1,Math.max(0,Number.isFinite(+l.x)?+l.x:.5)), y:Math.min(1,Math.max(0,Number.isFinite(+l.y)?+l.y:.5))
     }));}
@@ -454,8 +471,8 @@ function studioPage(){
           <label for="photoInput">${tr('upload')} <small>(JPG / PNG / WebP • ${words('en fazla 10 MB','max. 10 MB')})</small></label>
           <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="photoPrivacyInfo">
           <div class="mini-help" id="photoPrivacyInfo">${words('Fotoğraf önce küçültülür; EXIF metadata çıkarılır. Aynı anda en fazla 3 fotoğraf.','Fotos werden verkleinert, EXIF-Metadaten entfernt. Maximal 3 Fotos gleichzeitig.')}</div>
-          <label for="fillMode">${words('Görsel yerleşimi','Bildplatzierung')}</label><select id="fillMode">${editor.product==='keychain'?`<option value="smart" ${editor.fillMode==='smart'?'selected':''}>${words('Doğal yuvarlak · Yüzleri koru','Natürlich rund · Gesichter erhalten')}</option>`:''}<option value="cover" ${editor.fillMode==='cover'?'selected':''}>${words('Tam kapla · Kenarlarda boşluk bırakma','Fläche füllen · Randlos')}</option><option value="contain" ${editor.fillMode==='contain'?'selected':''}>${words('Motifi kesmeden ortala','Motiv vollständig zentrieren')}</option></select>
-          <p class="mini-help">${editor.fillMode==='smart'?smartFitHelp(sel):editor.fillMode==='cover'?words('Tam kaplama kenarları kırpabilir. Şeffaf desenler kumaş üzerinde şeffaf kalır.','Randloses Füllen kann Ränder beschneiden. Transparente Motive bleiben auf Stoff transparent.'):words('Fotoğrafın tamamı alana sığar. Grup fotoğrafında kişi sayısı arttığında da kenardaki kişiler kesilmez; boşluk kalabilir.','Das ganze Foto wird eingepasst. Auch bei Gruppen bleiben Personen am Rand erhalten; freie Ränder sind möglich.')}</p>
+          <label for="fillMode">${words('Görsel yerleşimi','Bildplatzierung')}</label><select id="fillMode">${editor.product==='keychain'?`<option value="smart" ${editor.fillMode==='smart'?'selected':''}>${words('Doğal yuvarlak · Yüzleri koru','Natürlich rund · Gesichter erhalten')}</option>`:''}<option value="cover" ${editor.fillMode==='cover'?'selected':''}>${words('Tam kapla · Kenarlarda boşluk bırakma','Fläche füllen · Randlos')}</option><option value="contain" ${editor.fillMode==='contain'?'selected':''}>${words('Fotoğrafın tamamı (kenarlar bulanık dolar)','Ganzes Foto (Ränder weich gefüllt)')}</option></select>
+          <p class="mini-help">${editor.fillMode==='smart'?smartFitHelp(sel):editor.fillMode==='cover'?words('Fotoğraf ürünü boşluksuz kaplar. Bulunan yüzlerin hepsi görünür kalır: kalabalık grupta fotoğraf gerekirse biraz küçülür ve kenarlar bulanık uzantıyla dolar. Yazı eklersen fotoğraf yazıya yer açar.','Das Foto füllt das Produkt randlos. Alle erkannten Gesichter bleiben sichtbar: Bei großen Gruppen wird das Foto bei Bedarf etwas kleiner und die Ränder weich ergänzt. Mit Text macht das Foto Platz für die Schrift.'):words('Fotoğrafın tamamı alana sığar; kenardaki kişiler kesilmez. Kalan kenarlar aynı fotoğrafın yumuşak, bulanık uzantısıyla dolar. Şeffaf PNG motifler olduğu gibi kalır.','Das ganze Foto wird eingepasst; Personen am Rand bleiben erhalten. Freie Ränder werden mit einer weichen, unscharfen Fortsetzung desselben Fotos gefüllt. Transparente PNG-Motive bleiben unverändert.')}</p>
           ${editor.fillMode==='cover'?`<label for="focusX">${words('Yatay odak','Horizontaler Fokus')}</label><input id="focusX" type="range" min="0" max="1" step=".01" value="${editor.focusX??.5}"><label for="focusY">${words('Dikey odak','Vertikaler Fokus')}</label><input id="focusY" type="range" min="0" max="1" step=".01" value="${editor.focusY??.5}">`:''}
           <label for="printBackground">${words('Baskı alanının fonu','Hintergrund der Druckfläche')}</label><select id="printBackground">${editor.product==='keychain'?`<option value="photo" ${editor.printBackground==='photo'?'selected':''}>${words('Fotoğrafla yumuşak tamamla','Mit Foto weich ergänzen')}</option>`:''}<option value="transparent" ${editor.printBackground==='transparent'?'selected':''}>${words('Şeffaf · Ürün rengi görünsün','Transparent · Produktfarbe sichtbar')}</option><option value="color" ${editor.printBackground==='color'?'selected':''}>${words('Kendi rengimi seçeyim','Eigene Farbe wählen')}</option></select>
           ${editor.printBackground==='color'?`<label for="printBackgroundColor">${words('Fon rengi','Hintergrundfarbe')}</label><input id="printBackgroundColor" type="color" value="${editor.printBackgroundColor||'#ffffff'}">`:''}
@@ -477,7 +494,7 @@ function studioPage(){
           <label for="angleInput">${tr('rotation')} <output id="angleOutput">${sel?.angle||0}°</output></label><input id="angleInput" type="range" min="-180" max="180" value="${sel?.angle||0}">
 
           <div class="form-divider"></div><label>${tr('layers')}</label>
-          <div class="layer-list">${editor.layers.map((l,i)=>`<button type="button" data-layer-id="${escapeHTML(l.id)}" class="layer-item ${l.id===editor.selected?'active':''}">${l.type==='image'?words('Geçici fotoğraf','Temporäres Foto'):escapeHTML(l.text||'Text')} <span>${i+1}</span></button>`).join('')}</div>
+          <div class="layer-list">${editor.layers.map((l,i)=>`<button type="button" data-layer-id="${escapeHTML(l.id)}" class="layer-item ${l.id===editor.selected?'active':''}">${l.type==='image'?words('Geçici fotoğraf','Temporäres Foto'):l.poem?'¶ '+escapeHTML(poemLines(l.text)[0]||words('Şiir','Gedicht'))+'…':escapeHTML(l.text||'Text')} <span>${i+1}</span></button>`).join('')}</div>
           <button type="button" class="btn secondary tiny" data-action="remove-layer">✕ ${tr('deleteLayer')}</button>
         </div>
       </aside>
@@ -493,6 +510,12 @@ function studioPage(){
             <label for="finishSelect">${words('Yazı efekti','Schrifteffekt')}<select id="finishSelect">${Object.entries(FINISHES).map(([id,label])=>`<option value="${id}">${words(...label)}</option>`).join('')}</select></label>
           </div>
           <small id="nameHelp">${words('Yazdığın isim ön izlemeye ve PNG dosyana işlenir.','Dein Name erscheint in der Vorschau und in deiner PNG-Datei.')}</small>
+        </div>
+        <div class="name-field poem-field">
+          <label for="poemInput">${words('Şiir veya çok satırlı yazı','Gedicht oder mehrzeiliger Text')} <small>${words('(resimsiz de olur)','(auch ohne Foto)')}</small></label>
+          <textarea id="poemInput" rows="5" maxlength="600" spellcheck="true" aria-describedby="poemHelp" placeholder="${words('Her satır için Enter’a bas…','Für jede Zeile Enter drücken …')}">${escapeHTML(editor.layers.find(l=>l.poem)?.text||'')}</textarea>
+          <div class="poem-actions"><button type="button" class="btn secondary tiny" data-action="poem-sample">${words('Örnek dize ekle','Beispielvers einfügen')}</button><button type="button" class="btn secondary tiny" data-action="poem-only">${words('Yalnız yazı (resimsiz)','Nur Text (ohne Foto)')}</button></div>
+          <small id="poemHelp">${words('En fazla 14 satır. Yazı ürüne otomatik sığar: resim yoksa ürünün tamamına ortalanır, resim varsa kendine yer açar. Yazı stilini ve efekti yukarıdan seç; Boyut kaydırıcısı otomatik boyutu kapatır.','Bis zu 14 Zeilen. Der Text passt sich automatisch an: ohne Foto mittig auf dem ganzen Produkt, mit Foto bekommt er eigenen Platz. Schriftstil und Effekt oben wählen; der Größenregler schaltet die Automatik aus.')}</small>
         </div>
         <p class="studio-hint">${tr('productHint')}</p>
         <div class="canvas-foot"><button type="button" class="btn secondary tiny" data-action="undo">↶ ${tr('undo')}</button><button type="button" class="btn secondary tiny" data-action="redo">↷ ${tr('redo')}</button></div>
@@ -748,7 +771,16 @@ function drawCollage(ctx,arts,frame,area,design,showSelection){
     const start=faces.length?{anchorX:(Math.min(...faces.map(f=>f.x))+Math.max(...faces.map(f=>f.x+f.w)))/2,anchorY:(Math.min(...faces.map(f=>f.y))+Math.max(...faces.map(f=>f.y+f.h)))/2}:{focusX:.5,focusY:.5};
     const angle=(layer.angle||0)*Math.PI/180,fit=coverFit(cell,iw,ih,layer.zoom,angle,start,(layer.panX||0)*area.w/2,(layer.panY||0)*area.h/2);
     ctx.save();ctx.beginPath();ctx.rect(cell.x-.4,cell.y-.4,cell.w+.8,cell.h+.8);ctx.clip();
-    ctx.translate(fit.cx,fit.cy);ctx.rotate(angle);ctx.drawImage(image,-fit.w/2,-fit.h/2,fit.w,fit.h);ctx.restore();
+    // A group that is wider than its cell stays complete: smaller photo over a blurred copy of itself.
+    const span=faces.length?{x:Math.max(0,Math.min(...faces.map(f=>f.x-f.w*.15))),r:Math.min(1,Math.max(...faces.map(f=>f.x+f.w*1.15))),y:Math.max(0,Math.min(...faces.map(f=>f.y-f.h*.35))),b:Math.min(1,Math.max(...faces.map(f=>f.y+f.h*1.2)))}:null;
+    const fitScale=span?Math.min(cell.w*.96/((span.r-span.x)*iw),cell.h*.96/((span.b-span.y)*ih)):Infinity;
+    if(span&&fitScale<fit.scale&&!angle&&(layer.zoom||1)<=1){
+      ctx.save();ctx.filter=`blur(${Math.max(2,cell.w*.045)}px)`;ctx.drawImage(image,fit.cx-fit.w/2,fit.cy-fit.h/2,fit.w,fit.h);ctx.restore();
+      const w=iw*fitScale,h=ih*fitScale,fx=(span.x+span.r)/2*w,fy=(span.y+span.b)/2*h;
+      const x=Math.min(cell.x,Math.max(cell.x+cell.w-w,cell.x+cell.w/2-fx)),y=Math.min(cell.y,Math.max(cell.y+cell.h-h,cell.y+cell.h/2-fy));
+      ctx.drawImage(window.EJDERPhotoLayout?.soften(image)||image,w<cell.w?cell.x+(cell.w-w)/2:x,h<cell.h?cell.y+(cell.h-h)/2:y,w,h);ctx.restore();
+    }else{
+    ctx.translate(fit.cx,fit.cy);ctx.rotate(angle);ctx.drawImage(image,-fit.w/2,-fit.h/2,fit.w,fit.h);ctx.restore();}
     if(showSelection&&art.kind==='photo')selectedBounds.push({id:layer.id,x:cell.x+cell.w/2,y:cell.y+cell.h/2,w:cell.w,h:cell.h});
   });
 }
@@ -784,8 +816,9 @@ function placeCoverSubject(image,ink,faces,frame,frontWidth,focusX,focusY,safeTo
   }
   const safeHeight=Math.max(1,frame.y+frame.h-Math.max(frame.y,safeTop));
   if(safe)scale=Math.min(scale,frontWidth/Math.max(1,safe.right-safe.x),safeHeight/Math.max(1,safe.bottom-safe.y));
-  // An opaque photo never shrinks below the print area: no empty margins on the product.
-  if(ink.opaque)scale=Math.max(scale,frame.w/w,frame.h/h);
+  // An opaque photo fills the print area. Only to keep every detected person in view may it
+  // become smaller; the caller then fills the rest with a soft, blurred copy of the same photo.
+  if(ink.opaque&&!faces.length)scale=Math.max(scale,frame.w/w,frame.h/h);
   let x=frame.x+(frame.w-bw*scale)*focusX-b.x*scale;
   let y=frame.y+(frame.h-bh*scale)*focusY-b.y*scale;
   if(safe){
@@ -794,8 +827,8 @@ function placeCoverSubject(image,ink,faces,frame,frontWidth,focusX,focusY,safeTo
     y=Math.max(Math.max(frame.y,safeTop)-safe.y*scale,Math.min(frame.y+frame.h-safe.bottom*scale,y));
   }
   if(ink.opaque){
-    x=Math.min(frame.x,Math.max(frame.x+frame.w-w*scale,x));
-    y=Math.min(frame.y,Math.max(frame.y+frame.h-h*scale,y));
+    if(w*scale>=frame.w)x=Math.min(frame.x,Math.max(frame.x+frame.w-w*scale,x));
+    if(h*scale>=frame.h)y=Math.min(frame.y,Math.max(frame.y+frame.h-h*scale,y));
   }
   return {x,y,w:w*scale,h:h*scale};
 }
@@ -911,7 +944,7 @@ function placeCoverCaption(lines,area,product,round){
   const isCase=product.startsWith('case'),width=area.w*(round?.58:isCase?.74:product==='mug'?.73:.94);
   const bottom=area.y+area.h*(round?.86:isCase?.936:1);
   const pad=Math.min(area.w,area.h)*.012,gap=pad*.8;
-  const rowBudget=Math.max(1,(area.h*.35-2*pad-gap*(lines.length-1))/lines.length);
+  const band=lines.some(item=>item.lines)?.46:.35,rowBudget=Math.max(1,(area.h*band-2*pad-gap*(lines.length-1))/lines.length);
   const placements=lines.map(item=>fitLayer(area,item.width,item.height,{...item.layer,x:.5,y:.5},false,width/(area.w*.94),rowBudget/(area.h*.94)));
   const height=placements.reduce((sum,pos)=>sum+pos.h,0)+gap*(lines.length-1)+2*pad;
   const top=bottom-height;
@@ -956,6 +989,21 @@ function drawCanvasTo(canvas,includePhotos=true,showSelection=false,design=edito
   for(const layer of design.layers){
     if(layer.type==='image'){
       if(includePhotos)imageItem(photoImage(layer),layer,'photo');
+      continue;
+    }
+    if(layer.poem){
+      const lines=poemLines(layer.text);if(!lines.some(s=>s.trim()))continue;
+      const measure=size=>{ctx.font=fontSpec(layer.font,size);let w=1;for(const s of lines)w=Math.max(w,ctx.measureText(s||' ').width);const ref=ctx.measureText('ÇÖŞĞİgjpy'),asc=ref.actualBoundingBoxAscent??size*.8,desc=ref.actualBoundingBoxDescent??size*.25;return {w,lh:size*1.28,asc,desc,h:size*1.28*(lines.length-1)+asc+desc};};
+      let size=layer.size||48,m=measure(100);
+      if(layer.autoSize!==false){
+        // Text alone fills the product; next to a photo it takes the caption band it is given.
+        const isCase=design.product.startsWith('case'),roundShape=!!PRODUCT_SURFACES[design.product].round;
+        const tw=area.w*(roundShape?.64:isCase?.68:.84),th=area.h*(imageCount?.4:roundShape?.6:isCase?.5:.8);
+        size=Math.max(10,Math.min(220,100*Math.min(tw/m.w,th/m.h)));
+      }
+      m=measure(size);const font=fontSpec(layer.font,size);
+      const edge=layer.finish==='outline'?Math.max(2.5,size*.095):layer.finish==='foil'?Math.max(1.5,size*.052):1.2;
+      items.push({kind:'text',layer,text:lines.join('\n'),lines,lineHeight:m.lh,font,edge,inkHeight:m.asc+m.desc,width:m.w+edge+7,height:m.h+edge+7,offsetX:0,offsetY:(m.asc-m.desc)/2});
       continue;
     }
     const text=String(layer.text||'').slice(0,80);if(!text.trim())continue;
@@ -1003,7 +1051,7 @@ function drawCanvasTo(canvas,includePhotos=true,showSelection=false,design=edito
     drawCollage(ctx,collageArt,caption?{...area,h:caption.top-area.y}:area,area,design,showSelection);
   }
   let layoutArea=hasBackground?{...area,y:caption?.top??(area.y+area.h-bandHeight),h:bandHeight}:area;
-  if(!hasBackground&&imageCount>0&&design.product.startsWith('case')&&(imageCount>1||design.surfaceVersion>=4)){
+  if(!hasBackground&&(imageCount>0||textItems.some(i=>i.layer.poem))&&design.product.startsWith('case')&&(imageCount>1||design.surfaceVersion>=4)){
     const model=window.EJDERCaseCatalog.models.find(m=>m.id===design.product);
     const top=design.product.endsWith('promax')?.315:model?.fullPrint?(model.print[1]-model.fullPrint[1])/model.fullPrint[3]:.40;
     // Separate photos stay below the camera and on the flat face, not the wrap.
@@ -1021,6 +1069,14 @@ function drawCanvasTo(canvas,includePhotos=true,showSelection=false,design=edito
     if(!caption)arrangeArtwork(textItems,textArea,false);
     arrangeArtwork(items.filter(i=>i.kind!=='text'),{...area,h:area.h-(textItems.length?bandHeight:0)},round);
   }else arrangeArtwork(items,layoutArea,round,autoCaption,mugMotif?.77:1);
+  // "Whole photo" mode stays gap-free too: a single opaque photo sits on a blurred copy of itself.
+  if(!hasBackground&&design.fillMode==='contain'&&design.printBackground!=='color'){
+    const photos=items.filter(i=>i.kind==='photo'&&visibleInk(i.image).opaque);
+    if(photos.length===1&&items.filter(i=>i.kind!=='text').length===1){
+      const im=photos[0].image,s=Math.max(area.w/im.naturalWidth,area.h/im.naturalHeight)*1.08,bw=im.naturalWidth*s,bh=im.naturalHeight*s;
+      ctx.save();ctx.filter=`blur(${Math.max(2,area.w*.045)}px)`;ctx.globalAlpha=.9;ctx.drawImage(im,area.x+(area.w-bw)/2,area.y+(area.h-bh)/2,bw,bh);ctx.restore();
+    }
+  }
   for(const item of items){
     const {layer,image,imageScale,text,edge,inkHeight,offsetX,offsetY}=item;
     let placement=layer.autoPosition?item.pos:fitLayer(area,item.width,item.height,layer,round);
@@ -1041,7 +1097,8 @@ function drawCanvasTo(canvas,includePhotos=true,showSelection=false,design=edito
         for(const [point,tone] of [[0,'#90521d'],[.25,'#efc770'],[.42,'#fff6cd'],[.56,'#b87930'],[.76,'#f4d58c'],[1,'#a66826']])gold.addColorStop(point,tone);
         ctx.strokeStyle=color;ctx.fillStyle=gold;
       }
-      ctx.strokeText(text,offsetX,offsetY);ctx.fillText(text,offsetX,offsetY);
+      if(item.lines){ctx.textAlign='center';item.lines.forEach((line,i)=>{if(!line.trim())return;ctx.save();ctx.translate(0,(i-(item.lines.length-1)/2)*item.lineHeight);ctx.strokeText(line,0,offsetY);ctx.fillText(line,0,offsetY);ctx.restore();});}
+      else{ctx.strokeText(text,offsetX,offsetY);ctx.fillText(text,offsetX,offsetY);}
     }
     if(showSelection&&item.kind!=='motif')selectedBounds.push(placement);
     ctx.restore();
@@ -1132,7 +1189,8 @@ function attachCanvasPointer(){
 }
 function updateControlValues(){
   const sel=selectedLayer();
-  const tx=document.getElementById('textInput');if(tx)tx.value=sel?.type==='text'?sel.text:'';
+  const tx=document.getElementById('textInput');if(tx)tx.value=sel?.type==='text'&&!sel.poem?sel.text:'';
+  const pm=document.getElementById('poemInput');if(pm&&document.activeElement!==pm)pm.value=sel?.poem?sel.text:(editor.layers.find(x=>x.poem)?.text||'');
   const fs=document.getElementById('fontSelect');if(fs)fs.value=sel?.font||editor.fontChoice;
   const finish=document.getElementById('finishSelect');if(finish)finish.value=sel?.finish||editor.finishChoice;
   const clr=document.getElementById('textColorInput');if(clr)clr.value=sel?.color||'#e8b974';
@@ -1286,9 +1344,9 @@ function savedDesign(p){
   design.fillMode=['cover','smart'].includes(p.fillMode)?p.fillMode:'contain';design.focusX=Math.max(0,Math.min(1,p.focusX??.5));design.focusY=Math.max(0,Math.min(1,p.focusY??.5));
   design.mugSides=p.mugSides==='double'?'double':'single';design.projectId=p.id;design.template=TEMPLATE_IDS.includes(p.template)?p.template:'minimal';design.themeApplied=p.themeApplied===true;design.productColor=p.colorVersion!==2&&p.surfaceVersion!==3&&p.productColor==='#faf0dc'?ORIGINAL:validProductColor(p.productColor);
   design.layers=(Array.isArray(p.layers)?p.layers:[]).filter(l=>l&&l.type==='text').slice(0,15).map(l=>({
-    ...textLayer(l.text??''),autoPosition:l.autoPosition===true,autoColor:l.autoColor===true,id:typeof l.id==='string'?l.id:newId(),
+    ...textLayer(l.text??'',l.poem===true),...(l.poem===true?{autoSize:l.autoSize!==false}:{}),autoPosition:l.autoPosition===true,autoColor:l.autoColor===true,id:typeof l.id==='string'?l.id:newId(),
     font:l.font==='script'&&!l.finish?'hand':Object.hasOwn(FONTS,l.font)?l.font:'serif',finish:Object.hasOwn(FINISHES,l.finish)?l.finish:'plain',
-    color:/^#[a-f\d]{6}$/i.test(l.color)?l.color:'#e8b974',size:Math.min(130,Math.max(22,Number(l.size)||68)),
+    color:/^#[a-f\d]{6}$/i.test(l.color)?l.color:'#e8b974',size:Math.min(l.poem===true?220:130,Math.max(l.poem===true?10:22,Number(l.size)||68)),
     angle:Math.min(180,Math.max(-180,Number(l.angle)||0)),x:Math.min(1,Math.max(0,Number.isFinite(+l.x)?+l.x:.5)),y:Math.min(1,Math.max(0,Number.isFinite(+l.y)?+l.y:.5))
   }));
   design.selected=design.layers[0]?.id||null;
@@ -1418,6 +1476,20 @@ ROOT.addEventListener('click', ev=>{
       action.textContent=opened?tr('giftClose'):tr('giftOpen');action.setAttribute('aria-expanded',String(!!opened));return;
     }
     case 'add-text':addText();document.getElementById('textInput')?.focus();return;
+    case 'poem-sample':{
+      // Public-domain verses: Yunus Emre (TR) and Goethe (DE).
+      const verse=words('Gelin tanış olalım\nİşi kolay kılalım\nSevelim sevilelim\nDünya kimseye kalmaz\n— Yunus Emre','Über allen Gipfeln\nIst Ruh,\nIn allen Wipfeln\nSpürest du\nKaum einen Hauch\n— J. W. von Goethe');
+      rememberUndo();let poem=editor.layers.find(l=>l.poem);if(!poem){if(editor.layers.filter(l=>l.type==='text').length>=15)return;poem=textLayer('',true);editor.layers.push(poem);}
+      poem.text=verse;poem.autoSize=true;poem.font='elegant';editor.selected=poem.id;loadFace(poem.font);refreshStudio();return;
+    }
+    case 'poem-only':{
+      const photos=editor.layers.filter(l=>l.type==='image').length;
+      if(!editor.layers.some(l=>l.poem&&poemLines(l.text).length)){document.getElementById('poemInput')?.focus();notify(words('Önce şiirini veya yazını yaz.','Schreibe zuerst dein Gedicht oder deinen Text.'));return;}
+      rememberUndo();for(const l of editor.layers.filter(l=>l.type==='image')){const ph=cachedImages.get(l.key);if(ph){window.EJDERPrint?.disposeSharp(ph);URL.revokeObjectURL(ph.url);ph.img.removeAttribute('src');cachedImages.delete(l.key);}}
+      editor.layers=editor.layers.filter(l=>l.type!=='image');editor.themeApplied=false;for(const l of editor.layers)if(l.poem){l.autoSize=true;l.autoPosition=true;l.x=l.y=.5;}
+      editor.selected=editor.layers.find(l=>l.poem)?.id||null;undoStack=[];redoStack=[];refreshStudio();
+      notify(photos?words('Fotoğraflar kaldırıldı; yazı ürünün tamamına yerleşti.','Fotos entfernt; der Text füllt jetzt das ganze Produkt.'):words('Yazı ürünün tamamına yerleşti.','Der Text füllt jetzt das ganze Produkt.'));return;
+    }
     case 'fit-photo':{const l=selectedLayer();if(l?.type!=='image')return;rememberUndo();Object.assign(l,{zoom:1,panX:0,panY:0,x:.5,y:.5,angle:0,autoPosition:true,size:130});editor.fillMode=editor.product==='keychain'?'smart':'cover';editor.focusX=editor.focusY=.5;refreshStudio();return;}
     case 'remove-layer':{
       if(!selectedLayer()){notify(tr('toastNoSelected'));return;}
@@ -1445,11 +1517,13 @@ ROOT.addEventListener('click', ev=>{
 });
 let inputUndoState=null;
 ROOT.addEventListener('focusin',ev=>{
+  if(ev.target.id==='poemInput'&&!selectedLayer()?.poem){const poem=editor.layers.find(l=>l.poem);if(poem){editor.selected=poem.id;updateControlValues();drawStudio();}}
+  if(ev.target.id==='textInput'&&selectedLayer()?.poem){const line=editor.layers.find(l=>l.type==='text'&&!l.poem);editor.selected=line?.id||null;updateControlValues();drawStudio();}
   if(['textInput','fontSelect','finishSelect'].includes(ev.target.id)&&selectedLayer()?.type!=='text'){
-    const existing=editor.layers.find(l=>l.type==='text');
+    const existing=editor.layers.find(l=>l.type==='text'&&(ev.target.id!=='textInput'||!l.poem));
     if(existing){editor.selected=existing.id;updateControlValues();drawStudio();}
   }
-  if(['sizeInput','angleInput','textColorInput','textInput','photoZoom','photoX','photoY','photoAngle','photoSharpen','focusX','focusY','printBackgroundColor'].includes(ev.target.id))inputUndoState=snapshotUndo();
+  if(['sizeInput','angleInput','textColorInput','textInput','poemInput','photoZoom','photoX','photoY','photoAngle','photoSharpen','focusX','focusY','printBackgroundColor'].includes(ev.target.id))inputUndoState=snapshotUndo();
 });
 ROOT.addEventListener('input',ev=>{
   const el=ev.target;const l=selectedLayer();
@@ -1468,7 +1542,14 @@ ROOT.addEventListener('input',ev=>{
     }
     return;
   }
-  if(el.id==='textInput'&&l?.type!=='text'&&el.value){
+  if(el.id==='poemInput'){
+    let poem=l?.poem?l:editor.layers.find(x=>x.poem);
+    if(!poem){if(!el.value.trim())return;if(editor.layers.filter(item=>item.type==='text').length>=15)return;poem=textLayer('',true);editor.layers.push(poem);}
+    poem.text=el.value.slice(0,600);editor.selected=poem.id;editor.tool='text';drawStudio();
+    const list=document.querySelector('.layer-list');if(list&&!list.querySelector(`[data-layer-id="${CSS.escape(poem.id)}"]`))refreshStudio();
+    return;
+  }
+  if(el.id==='textInput'&&(l?.type!=='text'||l.poem)&&el.value){
     if(editor.layers.filter(item=>item.type==='text').length>=15){el.value='';return;}
     rememberUndo();const fresh=textLayer(el.value);editor.layers.push(fresh);editor.selected=fresh.id;editor.tool='text';
     drawStudio();return;
@@ -1479,9 +1560,9 @@ ROOT.addEventListener('input',ev=>{
   if(l.type==='image'&&['photoZoom','photoX','photoY'].includes(el.id)){l[{photoZoom:'zoom',photoX:'panX',photoY:'panY'}[el.id]]=Number(el.value);updatePhotoControls();drawStudio();return;}
   if(l.type==='image'&&el.id==='photoAngle'){l.angle=Number(el.value);updatePhotoControls();drawStudio();return;}
   if(l.type==='image'&&el.id==='photoSharpen'){l.sharpen=Number(el.value);updatePhotoControls();drawStudio();return;}
-  if(el.id==='textInput'&&l.type==='text'){l.text=el.value.slice(0,80);drawStudio();return;}
+  if(el.id==='textInput'&&l.type==='text'&&!l.poem){l.text=el.value.slice(0,80);drawStudio();return;}
   if(el.id==='textColorInput'&&l.type==='text'){l.autoColor=false;l.color=el.value;drawStudio();return;}
-  if(el.id==='sizeInput'){if(l.type==='image')l.autoFit=false;l.size=Number(el.value);document.getElementById('sizeOutput').textContent=el.value;drawStudio();return;}
+  if(el.id==='sizeInput'){if(l.type==='image')l.autoFit=false;if(l.poem)l.autoSize=false;l.size=Number(el.value);document.getElementById('sizeOutput').textContent=el.value;drawStudio();return;}
   if(el.id==='angleInput'){l.angle=Number(el.value);document.getElementById('angleOutput').textContent=el.value+'°';drawStudio();return;}
 });
 ROOT.addEventListener('change',ev=>{
@@ -1510,7 +1591,7 @@ ROOT.addEventListener('change',ev=>{
     if(field==='font')loadFace(el.value);
     drawStudio();return;
   }
-  if(['sizeInput','angleInput','textColorInput','textInput','photoZoom','photoX','photoY','photoAngle','photoSharpen','focusX','focusY','printBackgroundColor'].includes(el.id)){
+  if(['sizeInput','angleInput','textColorInput','textInput','poemInput','photoZoom','photoX','photoY','photoAngle','photoSharpen','focusX','focusY','printBackgroundColor'].includes(el.id)){
     if(inputUndoState&&inputUndoState!==snapshotUndo()&&undoStack.at(-1)!==inputUndoState){undoStack.push(inputUndoState);if(undoStack.length>22)undoStack.shift();redoStack.length=0;}
     inputUndoState=null;
     if(selectedLayer()){

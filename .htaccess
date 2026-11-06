@@ -13,6 +13,8 @@ AddType application/octet-stream .bin
   RewriteEngine On
   # Özel veri ve ayar klasörleri asla gösterilmez / Private Ordner niemals ausliefern
   RewriteRule ^(EJDER_SHOP_DATA|EJDER_CONFIG)(/|$) - [F,L]
+  # Kurulum notları ve yalnız sunucunun okuduğu dosyalar web'de açılmaz / Nur intern genutzte Dateien sperren
+  RewriteRule ^(README_TR_DE\.txt|STRATO_KURULUM_TR_DE\.txt|shop-seed\.json|tools/|\.git) - [F,L]
 
   # HTTPS'e yönlendirme: STRATO'da SSL etkinleştirildikten sonra alttaki 2 satırın başındaki # işaretini sil.
   # HTTPS-Weiterleitung: Nach Aktivierung von SSL bei STRATO bei den 2 Zeilen unten das # entfernen.
@@ -22,6 +24,12 @@ AddType application/octet-stream .bin
 
 # Güncellemeler ziyaretçiye hemen ulaşsın / Updates sofort ausliefern
 <IfModule mod_headers.c>
+  # Güvenlik başlıkları. Mikrofon yalnız bu site için açık (asistan), kamera ve konum kapalı.
+  # Sicherheits-Header. Mikrofon nur für diese Seite (Assistent), Kamera und Standort aus.
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), geolocation=(), payment=(), usb=(), microphone=(self)"
   <FilesMatch "^(sw\.js|index\.html|de\.html|manifest\.webmanifest)$">
     Header set Cache-Control "no-cache"
   </FilesMatch>

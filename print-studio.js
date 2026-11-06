@@ -110,18 +110,18 @@ function caseSpec(id){
   // Back plus side walls: 3D sublimation film wraps about 8 mm around each edge.
   return {fit:'keep',w:Math.round((d[0]+19)*2)/2,bleed:2,note:[(m?.model||'Kılıf')+' · arka + yan sarma',(m?.model||'Hülle')+' · Rückseite + Seiten']};
 }
-function defaults(id){return {...(id.startsWith('case')?caseSpec(id):SPECS[id]||{fit:'keep',w:150,bleed:2}),dpi:300,marks:true,paper:'auto',copies:1,wrap:true};}
-const STORE='ejder-print-v1';
+function defaults(id){return {...(id.startsWith('case')?caseSpec(id):SPECS[id]||{fit:'keep',w:150,bleed:2}),dpi:300,marks:true,copies:1,wrap:true,auto:true};}
+const STORE='ejder-print-v2';
 function loadAll(){try{return JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch{return {};}}
 function saveAll(all){try{localStorage.setItem(STORE,JSON.stringify(all));}catch{}}
 function settingsFor(id){
   const all=loadAll(),base=defaults(id),own=all.products?.[id]||{};
-  const mirror=typeof all.mirror==='boolean'?all.mirror:true;
-  return {...base,...own,mirror};
+  const mirror=typeof all.mirror==='boolean'?all.mirror:true,paper=['a4','a3','fit'].includes(all.paper)?all.paper:'a4';
+  return {...base,...own,mirror,paper};
 }
 function remember(id,s){
   const all=loadAll();all.products=all.products||{};
-  const {mirror,...rest}=s;all.products[id]=rest;all.mirror=!!mirror;saveAll(all);
+  const {mirror,paper,autoScale,...rest}=s;all.products[id]=rest;all.mirror=!!mirror;all.paper=paper;saveAll(all);
 }
 
 /* ---------- Rendering ---------- */
@@ -284,26 +284,46 @@ function effectiveDpi(panels,s){
   for(const p of panels){const px=(p.w+2*(Number(s.bleed)||0))*(p.h+2*(Number(s.bleed)||0))*(dpi/MM)**2;if(px>36e6)dpi=Math.min(dpi,Math.floor(Math.sqrt(36e6/px)*dpi/10)*10);}
   return dpi;
 }
-function readForm(){
-  const f=id=>dialog.querySelector('#'+id);
-  state.s={...state.s,fit:f('prFit').value,w:Number(f('prW').value)||state.s.w,h:Number(f('prH').value)||state.s.h,bleed:clamp(Number(f('prBleed').value)||0,0,25),
+// Automatic size: the product's standard print size, reduced only as far as the chosen printer
+// paper requires (A4 for budget sublimation printers). Bleed and crop marks are kept full size.
+function autoSize(s){
+  const base=defaults(state.id),aspect=aspectOf(state.faces[0]);
+  const w0=base.h&&s.fit!=='keep'?base.w:sizeOf({...base,fit:'keep'},aspect).w;
+  const h0=s.fit==='keep'?w0/aspect:(base.h||sizeOf({...base,fit:'keep'},aspect).h);
+  const across=state.id==='mug'&&state.faces.length===2&&s.wrap?2:1;
+  let k=1;
+  if(s.paper!=='fit'){
+    const [pw,ph]=PAPERS[s.paper]||PAPERS.a4,extra=2*(Number(s.bleed)||0)+2*(s.marks?6:2);
+    const room=(W,H)=>Math.min((W-2*MARGIN-extra)/(w0*across),(H-2*MARGIN-FOOT-extra)/h0);
+    k=Math.min(1,Math.max(room(pw,ph),room(ph,pw)));
+  }
+  const r=v=>Math.max(5,Math.floor(v*2)/2);
+  return {...s,w:r(w0*k),h:r(h0*k),autoScale:k};
+}
+function cur(){return state.s.auto?autoSize(state.s):state.s;}
+function readForm(target){
+  const f=id=>dialog.querySelector('#'+id),manual=target&&['prW','prH'].includes(target.id);
+  if(manual)state.s={...cur(),auto:false};
+  state.s={...state.s,fit:f('prFit').value,w:manual?Number(f('prW').value)||state.s.w:state.s.w,h:manual?Number(f('prH').value)||state.s.h:state.s.h,bleed:clamp(Number(f('prBleed').value)||0,0,25),
     dpi:Number(f('prDpi').value)||300,mirror:f('prMirror').checked,marks:f('prMarks').checked,wrap:f('prWrap').checked,paper:f('prPaper').value,copies:clamp(Math.round(Number(f('prCopies').value)||1),1,60)};
   remember(state.id,state.s);
 }
 function fillForm(){
-  const s=state.s,f=id=>dialog.querySelector('#'+id),size=sizeOf(s,aspectOf(state.faces[0]));
+  const s=cur(),f=id=>dialog.querySelector('#'+id),size=sizeOf(s,aspectOf(state.faces[0]));
+  f('prAuto').hidden=!s.auto;
   f('prFit').value=s.fit;f('prW').value=size.w;f('prH').value=size.h;f('prH').disabled=s.fit==='keep';
   f('prBleed').value=s.bleed;f('prDpi').value=String(s.dpi);f('prMirror').checked=!!s.mirror;f('prMarks').checked=!!s.marks;
   f('prWrap').checked=!!s.wrap;f('prWrapRow').hidden=!(state.id==='mug'&&state.faces.length===2);f('prPaper').value=s.paper;f('prCopies').value=s.copies;
 }
 function summary(){
-  const s=state.s,panels=panelsFor(state.faces,s,state.id),plan=layout(panels,s),dpi=effectiveDpi(panels,s),pd=photoDpi(state.faces,s);
+  const s=cur(),panels=panelsFor(state.faces,s,state.id),plan=layout(panels,s),dpi=effectiveDpi(panels,s),pd=photoDpi(state.faces,s);
   const paper=plan.page.name==='fit'?t('Tasarım boyutunda sayfa','Seite in Motivgröße'):plan.page.name.toUpperCase()+' '+(plan.page.orient==='L'?t('yatay','quer'):t('dikey','hoch'));
   const one=panels[0],px=v=>Math.round(v*dpi/MM);
   const lines=[];
   if(plan.page.tooBig)lines.push('⚠ '+t('Bu boyut seçilen kâğıda sığmıyor. Kâğıdı “Otomatik” veya “Tasarım boyutunda” yap ya da ölçüyü küçült.','Diese Größe passt nicht auf das gewählte Papier. „Automatisch“ oder „In Motivgröße“ wählen oder Maß verkleinern.'));
   else lines.push(`${paper} · ${plan.pages.length} ${t('sayfa','Seite(n)')} · ${Math.min(plan.page.cap.n,plan.page.need)} ${t('baskı/sayfa','Drucke/Seite')}`);
   lines.push(`${t('Baskı','Druck')}: ${fmt(one.w)} × ${fmt(one.h)} mm + ${fmt(s.bleed)} mm ${t('taşma','Beschnitt')} · ${px(one.w+2*s.bleed)} × ${px(one.h+2*s.bleed)} px · ${dpi} DPI${dpi<s.dpi?' ('+t('bellek için düşürüldü','wegen Speicher reduziert')+')':''}`);
+  if(s.auto)lines.push(s.autoScale<.995?`⚙ ${t('Otomatik','Automatisch')}: ${t('ürünün standart ölçüsü','Standardmaß des Produkts')} ${s.paper.toUpperCase()} ${t('kâğıda sığması için','zum Papier passend auf')} %${Math.round(s.autoScale*100)} ${t('ölçeklendi. Tam boy için A3 veya Büyük format seç.','skaliert. Für volle Größe A3 oder Großformat wählen.')}`:`⚙ ${t('Otomatik: ürünün standart baskı ölçüsü, tam boy.','Automatisch: Standarddruckmaß des Produkts in voller Größe.')}`);
   if(s.mirror)lines.push(t('↔ Aynalı: süblimasyon / transfer kâğıdında doğru okunur.','↔ Gespiegelt: auf Sublimations- / Transferpapier seitenrichtig.'));
   let quality='';
   if(pd!==null)quality=pd>=240?`✓ ${t('Fotoğraf kalitesi çok iyi','Fotoqualität sehr gut')} (~${pd} DPI)`:pd>=150?`✓ ${t('Fotoğraf kalitesi uygun; otomatik netlik destekliyor','Fotoqualität passend; automatische Schärfe hilft')} (~${pd} DPI)`:`⚠ ${t('Fotoğraf bu ölçü için düşük çözünürlüklü','Foto für dieses Maß gering aufgelöst')} (~${pd} DPI). ${t('Daha büyük bir fotoğraf veya küçük ölçü önerilir.','Größeres Foto oder kleineres Maß empfohlen.')}`;
@@ -319,7 +339,7 @@ function drawPreview(){
   ctx.fillStyle='#fffdf8';ctx.shadowColor='#0008';ctx.shadowBlur=12;ctx.fillRect(ox,oy,page[0]*k,page[1]*k);ctx.shadowBlur=0;
   const first=sum.plan.pages[0]||[],cache=new Map(),thumbDpi=clamp(k*MM*1.4,8,72);
   for(const it of first){
-    let img=cache.get(it.panel);if(!img){img=renderPanel(it.panel,state.s,thumbDpi);cache.set(it.panel,img);}
+    let img=cache.get(it.panel);if(!img){img=renderPanel(it.panel,cur(),thumbDpi);cache.set(it.panel,img);}
     const b=it.b,w=(it.panel.w+2*b)*k,h=(it.panel.h+2*b)*k;ctx.drawImage(img,ox+it.x*k,oy+it.y*k,w,h);
     ctx.strokeStyle='#c0392b';ctx.setLineDash([3,2]);ctx.lineWidth=1;ctx.strokeRect(ox+(it.x+b)*k,oy+(it.y+b)*k,it.panel.w*k,it.panel.h*k);ctx.setLineDash([]);
   }
@@ -338,11 +358,11 @@ function build(){
       <label>${t('Yerleşim','Platzierung')}<select id="prFit"><option value="keep">${t('Oranı koru (kırpmadan, boşluksuz)','Seitenverhältnis halten (ohne Beschnitt)')}</option><option value="cover">${t('Ölçüyü doldur (kenarlardan kırpar)','Maß füllen (Ränder beschnitten)')}</option><option value="stretch">${t('Ürüne sar (3D ön izlemedeki gibi)','Auf Produkt wickeln (wie 3D-Vorschau)')}</option></select></label>
       <div class="pr-row"><label>${t('Genişlik (mm)','Breite (mm)')}<input id="prW" type="number" min="5" max="1500" step="0.5" inputmode="decimal"></label><label>${t('Yükseklik (mm)','Höhe (mm)')}<input id="prH" type="number" min="5" max="1500" step="0.5" inputmode="decimal"></label></div>
       <div class="pr-row"><label>${t('Taşma payı (mm)','Beschnitt (mm)')}<input id="prBleed" type="number" min="0" max="25" step="0.5" inputmode="decimal"></label><label>${t('Çözünürlük','Auflösung')}<select id="prDpi"><option value="200">200 DPI</option><option value="300">300 DPI</option><option value="360">360 DPI</option></select></label></div>
-      <div class="pr-row"><label>${t('Kâğıt','Papier')}<select id="prPaper"><option value="auto">${t('Otomatik (A4 → A3)','Automatisch (A4 → A3)')}</option><option value="a4">A4</option><option value="a3">A3</option><option value="fit">${t('Tasarım boyutunda','In Motivgröße')}</option></select></label><label>${t('Adet','Anzahl')}<input id="prCopies" type="number" min="1" max="60" step="1" inputmode="numeric"></label></div>
+      <div class="pr-row"><label>${t('Kâğıt','Papier')}<select id="prPaper"><option value="a4">${t('A4 · bütçe yazıcı (önerilen)','A4 · Einsteigerdrucker (empfohlen)')}</option><option value="a3">${t('A3 yazıcı','A3-Drucker')}</option><option value="fit">${t('Büyük format / tam boy','Großformat / volle Größe')}</option></select></label><label>${t('Adet','Anzahl')}<input id="prCopies" type="number" min="1" max="60" step="1" inputmode="numeric"></label></div>
       <label class="pr-check"><input type="checkbox" id="prMirror"> ${t('Ayna görüntü (süblimasyon / transfer kâğıdı)','Spiegeln (Sublimations- / Transferpapier)')}</label>
       <label class="pr-check"><input type="checkbox" id="prMarks"> ${t('Kesim işaretleri','Schnittmarken')}</label>
       <label class="pr-check" id="prWrapRow"><input type="checkbox" id="prWrap"> ${t('Kupa: ön ve arka yüzü tek sarma baskıda birleştir','Tasse: Vorder- und Rückseite als eine Wicklung')}</label>
-      <button type="button" class="btn secondary tiny" data-pr="reset">${t('Bu ürünün varsayılan ölçüsüne dön','Standardmaß dieses Produkts')}</button>
+      <button type="button" class="btn secondary tiny" data-pr="reset">⚙ ${t('Otomatik baskı ayarları','Automatische Druckeinstellungen')}</button><p class="pr-auto" id="prAuto">⚙ ${t('Otomatik: ölçü ürüne ve kâğıda göre ayarlanır. Ölçüyü elle değiştirirsen otomatik kapanır.','Automatisch: Maß nach Produkt und Papier. Bei manueller Änderung wird die Automatik beendet.')}</p>
       <p class="pr-note" id="prNote"></p>
     </div>
   </div>
@@ -351,11 +371,11 @@ function build(){
   <p class="pr-foot">${t('Fotoğraflar cihazında kalır. Ayarlar her ürün için bu tarayıcıda hatırlanır. İlk baskıda kontrol çizgisini cetvelle ölç; 50 mm değilse yazıcıda “Gerçek boyut / %100” seç.','Fotos bleiben auf deinem Gerät. Einstellungen werden je Produkt in diesem Browser gespeichert. Beim ersten Druck die Kontrolllinie nachmessen; ist sie nicht 50 mm, im Druckdialog „Tatsächliche Größe / 100 %“ wählen.')}</p>
   </form>`;
   document.body.append(dialog);
-  dialog.addEventListener('input',e=>{if(e.target.matches('input,select')){readForm();if(state.s.fit==='keep')dialog.querySelector('#prH').value=sizeOf(state.s,aspectOf(state.faces[0])).h;schedulePreview();}});
-  dialog.addEventListener('change',e=>{if(e.target.matches('input,select')){readForm();fillForm();schedulePreview();}});
+  dialog.addEventListener('input',e=>{if(e.target.matches('input,select')){readForm(e.target);if(cur().fit==='keep')dialog.querySelector('#prH').value=sizeOf(cur(),aspectOf(state.faces[0])).h;schedulePreview();}});
+  dialog.addEventListener('change',e=>{if(e.target.matches('input,select')){readForm(e.target);fillForm();schedulePreview();}});
   dialog.addEventListener('click',e=>{
     const b=e.target.closest('[data-pr]');if(!b)return;
-    if(b.dataset.pr==='reset'){state.s={...defaults(state.id),mirror:state.s.mirror};remember(state.id,state.s);fillForm();schedulePreview();}
+    if(b.dataset.pr==='reset'){state.s={...defaults(state.id),mirror:true,paper:state.s.paper};remember(state.id,state.s);fillForm();schedulePreview();}
     if(b.dataset.pr==='pdf')exportPdf();
     if(b.dataset.pr==='png')exportPng();
   });
@@ -392,7 +412,7 @@ async function withBusy(fn){
   finally{busy=false;buttons.forEach(b=>b.disabled=false);if(dialog.open)drawPreview();}
 }
 function exportPdf(){return withBusy(async()=>{
-  const s=state.s,panels=panelsFor(state.faces,s,state.id),plan=layout(panels,s),dpi=effectiveDpi(panels,s);
+  const s=cur(),panels=panelsFor(state.faces,s,state.id),plan=layout(panels,s),dpi=effectiveDpi(panels,s);
   if(!plan.pages.length)throw Error('layout');
   const images=[],index=new Map();
   for(const p of panels){const c=renderPanel(p,s,dpi),blob=await jpeg(c);if(!blob)throw Error('jpeg');index.set(p,images.length);images.push({w:c.width,h:c.height,data:new Uint8Array(await blob.arrayBuffer())});release(c);}
@@ -402,7 +422,7 @@ function exportPdf(){return withBusy(async()=>{
   S().notify(t('PDF hazır. Yazdırırken “Gerçek boyut / %100” seç; ölçeklendirme kapalı olsun.','PDF bereit. Beim Drucken „Tatsächliche Größe / 100 %“ wählen, ohne Skalierung.'));
 });}
 function exportPng(){return withBusy(async()=>{
-  const s=state.s,panels=panelsFor(state.faces,s,state.id),dpi=effectiveDpi(panels,s),files=[];
+  const s=cur(),panels=panelsFor(state.faces,s,state.id),dpi=effectiveDpi(panels,s),files=[];
   for(const p of panels){const c=renderPanel(p,s,dpi),blob=await pngWithDpi(c,dpi);release(c);files.push({name:fileBase(s,p)+'-'+p.label+'-'+dpi+'dpi'+(s.mirror?'-ayna':'')+'.png',blob});}
   if(files.length===1)download(files[0].blob,files[0].name);
   else download(await window.EJDERDownloads.zip(files),fileBase(s,panels[0])+'-'+dpi+'dpi.zip');
